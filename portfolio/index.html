@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Ange Carmelle</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#170B12',
+                        card: '#22121C',
+                        rose: '#FF6FA0',
+                        rosedeep: '#E04F88',
+                        blush: '#FFD6E8',
+                        lilac: '#C9A6E8',
+                        gold: '#F3C77E',
+                        cream: '#FBEAF0',
+                        muted: '#C9A4B3'
+                    },
+                    fontFamily: {
+                        display: ['"Playfair Display"', 'serif'],
+                        script: ['"Dancing Script"', 'cursive'],
+                        body: ['"Quicksand"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #170B12;
+            background-image: radial-gradient(circle at 15% 20%, rgba(201,166,232,0.08), transparent 45%),
+                               radial-gradient(circle at 85% 75%, rgba(255,111,160,0.08), transparent 45%);
+        }
+
+        /* Halo doux autour de la photo */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 25px rgba(255,111,160,0.35), 0 0 50px rgba(201,166,232,0.25); }
+            50% { box-shadow: 0 0 40px rgba(255,111,160,0.55), 0 0 70px rgba(243,199,126,0.35); }
+        }
+        .photo-glow { animation: pulse-glow 4.5s infinite ease-in-out; }
+
+        /* Anneau pointillé qui tourne  autour de la photo */
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .charm-ring { animation: spin-slow 30s linear infinite; }
+
+        /* Flottaison des badges  */
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+        .tech-orbit { animation: float-slow 6s infinite ease-in-out; }
+        .tech-orbit:nth-child(even) { animation-delay: 2s; }
+
+        /*  des séparateurs de section */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.6; transform: scale(0.9) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.15) rotate(15deg); }
+        }
+        .sparkle-icon { animation: twinkle 3s ease-in-out infinite; }
+
+        #bgCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .font-script { font-family: 'Dancing Script', cursive; }
+
+        /* Cadrage de la photo */
+        .profile-photo {
+            object-position: 50% 18%;
+        }
+
+        /* Séparateur signature  ligne dégradée + sparkle */
+        .section-divider {
+            position: relative;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #FF6FA0, #C9A6E8, #F3C77E, transparent);
+            opacity: 0.5;
+        }
+        .section-divider .sparkle-wrap {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 34px; height: 34px;
+            border-radius: 9999px;
+            background: #170B12;
+            border: 1px solid rgba(255,111,160,0.35);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #170B12; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #FF6FA0, #C9A6E8, #F3C77E); border-radius: 4px; }
+    </style>
+</head>
+<body class="text-cream font-body overflow-x-hidden">
+    <canvas id="bgCanvas"></canvas>
+
+    <nav class="fixed top-0 w-full z-50 bg-ink/70 backdrop-blur-md py-4 px-6 md:px-16 flex justify-between items-center border-b border-rose/10">
+        <div class="flex items-center gap-3">
+            <img src="../portfolio/image/photo-shooting-lps.jpeg"
+                 alt="Ange Carmelle"
+                 class="profile-photo w-10 h-10 rounded-full object-cover border-2 border-rose">
+            <span class="font-script text-2xl text-blush hidden sm:block">Ange Carmelle Gbedji</span>
+        </div>
+        <ul class="flex items-center gap-5 md:gap-8 font-medium text-[15px] md:text-base">
+            <li><a href="#home" class="text-muted hover:text-rose transition-colors">Accueil</a></li>
+            <li><a href="#about" class="text-muted hover:text-rose transition-colors">À propos</a></li>
+            <li><a href="#education" class="text-muted hover:text-rose transition-colors">Formations</a></li>
+            <li><a href="#skills" class="text-muted hover:text-rose transition-colors">Compétences</a></li>
+            <li><a href="#projects" class="text-muted hover:text-rose transition-colors">Projets</a></li>
+            <li><a href="#contact" class="text-muted hover:text-rose transition-colors">Contact</a></li>
+            <li>
+                <a href="Ange-Carmelle-Gbedji-v3.pdf" download class="bg-gradient-to-r from-rose to-gold hover:opacity-90 text-ink text-xs md:text-sm font-bold py-2 px-4 rounded-full transition-all hidden sm:inline-block shadow-md shadow-rose/20">
+                    <i class="fa-solid fa-download mr-1"></i> CV
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <section id="home" class="relative w-full min-h-screen mx-auto flex items-center justify-between px-6 md:px-16 z-10 pt-24 lg:pt-0">
+        <div class="flex flex-col lg:flex-row items-center justify-between w-full gap-16 mt-12">
+
+            <div class="flex flex-row items-start gap-5 max-w-xl order-2 lg:order-1">
+                <div class="flex flex-col justify-center items-center mt-5">
+                    <div class="w-4 h-4 rounded-full bg-rose"></div>
+                    <div class="w-[3px] sm:h-80 h-40 bg-gradient-to-b from-rose via-lilac to-transparent rounded-full"></div>
+                </div>
+                <div>
+                    <h1 class="text-4xl sm:text-6xl font-display font-bold text-cream mt-2 leading-tight">
+                        Salut, je suis <span class="font-script font-normal text-transparent bg-clip-text bg-gradient-to-r from-rose via-lilac to-gold text-5xl sm:text-7xl">Ange Carmelle</span>
+                    </h1>
+                    <p class="text-muted font-medium lg:text-[21px] sm:text-lg text-base mt-4 leading-relaxed">
+                        Développeuse Web & Mobile passionnée par la création d'applications modernes, raffinées et centrées sur l'expérience utilisateur.
+                    </p>
+
+                    <div class="mt-8 flex flex-col sm:flex-row sm:items-center gap-6">
+                        <a href="#projects" class="inline-block text-center bg-gradient-to-r from-rose to-lilac hover:opacity-90 text-ink font-bold py-3 px-8 rounded-full shadow-lg shadow-rose/20 transition-all transform hover:-translate-y-1">
+                            Voir mes projets
+                        </a>
+                        <div class="flex items-center gap-5 text-2xl text-muted">
+                            <a href="https://github.com/carmelle1707" target="_blank" rel="noopener" class="hover:text-rose transition-colors"><i class="fa-brands fa-github"></i></a>
+                            <a href="https://www.linkedin.com/in/ange-carmelle-gbedji-1a11b237a" target="_blank" rel="noopener" class="hover:text-lilac transition-colors"><i class="fa-brands fa-linkedin"></i></a>
+                            <a href="mailto:gbedjiangecarmelle@gmail.com" class="hover:text-gold transition-colors"><i class="fa-solid fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative flex justify-center items-center w-full lg:w-1/2 order-1 lg:order-2 my-12 lg:my-0" data-aos="zoom-in" data-aos-duration="1200">
+                <div class="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-rose/10 blur-3xl"></div>
+                <div class="absolute w-60 h-60 sm:w-80 sm:h-80 rounded-full bg-lilac/10 blur-3xl -bottom-10"></div>
+
+                <svg class="charm-ring absolute w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] z-[5]" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="96" fill="none" stroke="#F3C77E" stroke-width="1" stroke-dasharray="2 8" opacity="0.5"/>
+                    <circle cx="100" cy="4" r="3" fill="#FF6FA0"/>
+                    <circle cx="196" cy="100" r="3" fill="#C9A6E8"/>
+                    <circle cx="100" cy="196" r="3" fill="#F3C77E"/>
+                    <circle cx="4" cy="100" r="3" fill="#FF6FA0"/>
+                </svg>
+
+                <div class="photo-glow relative w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden border-4 border-rose/70 p-1 bg-ink/60 backdrop-blur-sm z-10">
+                    <img src="../portfolio/image/photo-shooting-lps.jpeg"
+                         alt="Ange Carmelle"
+                         class="profile-photo w-full h-full object-cover rounded-full transition-all duration-500 hover:scale-105">
+                </div>
+
+                <div class="tech-orbit absolute top-0 left-6 z-20 bg-card/90 border border-rose/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md text-xs sm:text-sm text-blush">
+                    <i class="fa-brands fa-react text-rose"></i> <span>React</span>
+                </div>
+                <div class="tech-orbit absolute top-12 -right-10 z-20 bg-card/90 border border-lilac/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md text-xs sm:text-sm text-blush" style="animation-delay: 1s;">
+                    <i class="fa-solid fa-n text-lilac"></i> <span>Next.js</span>
+                </div>
+                <div class="tech-orbit absolute top-1/2 -right-20 -translate-y-1/2 z-20 bg-card/90 border border-rose/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md text-xs sm:text-sm text-blush" style="animation-delay: 3.5s;">
+                    <i class="fa-solid fa-mobile-screen-button text-rose"></i> <span>Expo Go</span>
+                </div>
+                <div class="tech-orbit absolute bottom-16 -right-14 z-20 bg-card/90 border border-gold/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md text-xs sm:text-sm text-blush" style="animation-delay: 1.5s;">
+                    <i class="fa-solid fa-database text-gold"></i> <span>MongoDB</span>
+                </div>
+                <div class="tech-orbit absolute -bottom-8 left-1/2 -translate-x-1/2 z-20 bg-card/90 border border-gold/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md text-xs sm:text-sm text-blush" style="animation-delay: 2.5s;">
+                    <i class="fa-brands fa-react text-gold"></i> <span>React Native</span>
+                </div>
+                <div class="tech-orbit absolute bottom-16 -left-14 z-20 bg-card/90 border border-lilac/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md text-xs sm:text-sm text-blush" style="animation-delay: 4s;">
+                    <i class="fa-solid fa-database text-lilac"></i> <span>MySQL</span>
+                </div>
+                <div class="tech-orbit absolute top-1/2 -left-20 -translate-y-1/2 z-20 bg-card/90 border border-rose/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md text-xs sm:text-sm text-blush" style="animation-delay: 3s;">
+                    <i class="fa-brands fa-node-js text-rose"></i> <span>Node.js</span>
+                </div>
+                <div class="tech-orbit absolute top-12 -left-10 z-20 bg-card/90 border border-lilac/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md text-xs sm:text-sm text-blush" style="animation-delay: 4.5s;">
+                    <i class="fa-brands fa-css3-alt text-lilac"></i> <span>Tailwind</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-5 w-full left-0 flex justify-center items-center">
+            <a href="#about">
+                <div class="w-[28px] h-[50px] rounded-full border-2 border-rose/50 flex justify-center items-start p-1.5">
+                    <div class="w-2 h-2 rounded-full bg-rose mb-1 animate-bounce"></div>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"><div class="sparkle-wrap"><i class="fa-solid fa-sparkles sparkle-icon text-gold text-sm"></i></div></div>
+
+    <section id="about" class="py-24 px-6 md:px-16 max-w-7xl mx-auto min-h-screen flex flex-col justify-center relative z-10">
+        <div data-aos="fade-up">
+            <p class="text-rose uppercase tracking-[0.2em] text-sm font-semibold">Introduction</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-cream mt-2 mb-6">Vue d'ensemble<span class="text-lilac italic">.</span></h2>
+            <p class="text-muted max-w-3xl leading-relaxed text-[17px]">
+                Je suis une développeuse web et mobile basée en Côte d'Ivoire, passionnée par la création d'applications modernes et intuitives. J'aime transformer des idées en solutions numériques utiles grâce à React, React Native, Node.js et MongoDB. Mon objectif est de continuer à apprendre, relever de nouveaux défis techniques et contribuer à des projets innovants.
+            </p>
+        </div>
+
+        <div class="mt-16 flex flex-wrap gap-10 justify-center">
+            <div data-tilt data-tilt-max="10" data-tilt-glare data-tilt-max-glare="0.15" data-aos="fade-up"
+                 class="w-full sm:w-[300px] p-[1px] rounded-[24px] bg-gradient-to-br from-rose to-lilac cursor-pointer shadow-xl shadow-rose/5">
+                <div class="bg-card/95 backdrop-blur-sm rounded-[23px] py-8 px-6 min-h-[260px] flex flex-col justify-center items-center text-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-rose/10 flex items-center justify-center text-3xl text-rose"><i class="fa-solid fa-code"></i></div>
+                    <h3 class="text-cream text-[20px] font-display font-semibold">Développement Web</h3>
+                    <p class="text-muted text-sm">Création de sites et plateformes web modernes, dynamiques et responsives.</p>
+                </div>
+            </div>
+
+            <div data-tilt data-tilt-max="10" data-tilt-glare data-tilt-max-glare="0.15" data-aos="fade-up" data-aos-delay="100"
+                 class="w-full sm:w-[300px] p-[1px] rounded-[24px] bg-gradient-to-br from-lilac to-gold cursor-pointer shadow-xl shadow-lilac/5">
+                <div class="bg-card/95 backdrop-blur-sm rounded-[23px] py-8 px-6 min-h-[260px] flex flex-col justify-center items-center text-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-lilac/10 flex items-center justify-center text-3xl text-lilac"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                    <h3 class="text-cream text-[20px] font-display font-semibold">Développement Mobile</h3>
+                    <p class="text-muted text-sm">Conception d'applications mobiles performantes multiplateformes avec React Native.</p>
+                </div>
+            </div>
+
+            <div data-tilt data-tilt-max="10" data-tilt-glare data-tilt-max-glare="0.15" data-aos="fade-up" data-aos-delay="200"
+                 class="w-full sm:w-[300px] p-[1px] rounded-[24px] bg-gradient-to-br from-gold to-rose cursor-pointer shadow-xl shadow-gold/5">
+                <div class="bg-card/95 backdrop-blur-sm rounded-[23px] py-8 px-6 min-h-[260px] flex flex-col justify-center items-center text-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-gold/10 flex items-center justify-center text-3xl text-gold"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <h3 class="text-cream text-[20px] font-display font-semibold">Apprentissage Continu</h3>
+                    <p class="text-muted text-sm">Veille technologique active et adaptation constante aux nouveaux outils et standards.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"><div class="sparkle-wrap"><i class="fa-solid fa-star sparkle-icon text-lilac text-sm"></i></div></div>
+
+    <section id="education" class="py-24 px-6 md:px-16 max-w-7xl mx-auto flex flex-col justify-center relative z-10">
+        <div data-aos="fade-up" class="mb-12">
+            <p class="text-rose uppercase tracking-[0.2em] text-sm font-semibold">Mon parcours</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-cream mt-2">Formations<span class="text-lilac italic">.</span></h2>
+        </div>
+
+        <div class="relative">
+            <div class="hidden sm:block absolute left-[15px] top-2 bottom-2 w-[3px] bg-gradient-to-b from-rose via-lilac to-gold rounded-full"></div>
+
+            <div class="space-y-8">
+                <div data-aos="fade-up" class="relative sm:pl-12">
+                    <div class="hidden sm:flex absolute left-0 top-2 w-8 h-8 rounded-full bg-card border-2 border-rose items-center justify-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-rose"></div>
+                    </div>
+                    <div class="bg-card border border-rose/10 p-6 rounded-2xl shadow-md hover:border-rose/30 transition-colors">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <h3 class="text-cream font-display font-semibold text-lg">Université Virtuelle de Côte d'Ivoire (UVCI)</h3>
+                            <span class="text-rose text-xs font-semibold bg-rose/10 border border-rose/20 px-3 py-1 rounded-full">2025 — 2026</span>
+                        </div>
+                        <p class="text-muted text-sm">Licence 1 — Développement d'Applications et E-services <span class="italic">(en cours)</span></p>
+                    </div>
+                </div>
+
+                <div data-aos="fade-up" data-aos-delay="100" class="relative sm:pl-12">
+                    <div class="hidden sm:flex absolute left-0 top-2 w-8 h-8 rounded-full bg-card border-2 border-lilac items-center justify-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-lilac"></div>
+                    </div>
+                    <div class="bg-card border border-lilac/10 p-6 rounded-2xl shadow-md hover:border-lilac/30 transition-colors">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <h3 class="text-cream font-display font-semibold text-lg">WeCode</h3>
+                            <span class="text-lilac text-xs font-semibold bg-lilac/10 border border-lilac/20 px-3 py-1 rounded-full">Janvier 2026 — en cours</span>
+                        </div>
+                        <p class="text-muted text-sm mb-3">Formation en Développement  Full Stack et mobile : front-end, back-end, API et bases de données, à travers des projets concrets.</p>
+                        <div class="flex flex-wrap gap-2 text-[12px] font-semibold">
+                            <span class="text-lilac">#HTML5</span>
+                            <span class="text-rose">#CSS3</span>
+                            <span class="text-gold">#JavaScript</span>
+                            <span class="text-lilac">#PHP</span>
+                            <span class="text-rose">#Laravel</span>
+                            <span class="text-gold">#Vue.js</span>
+                            <span class="text-lilac">#Inertia.js</span>
+                            <span class="text-rose">#MySQL</span>
+                            <span class="text-gold">#Tailwind CSS</span>
+                            <span class="text-lilac">#Git & GitHub</span>
+                            <span class="text-lilac">#React Native & Expo go</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-aos="fade-up" data-aos-delay="100" class="relative sm:pl-12">
+                    <div class="hidden sm:flex absolute left-0 top-2 w-8 h-8 rounded-full bg-card border-2 border-lilac items-center justify-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-lilac"></div>
+                    </div>
+                    <div class="bg-card border border-lilac/10 p-6 rounded-2xl shadow-md hover:border-lilac/30 transition-colors">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <h3 class="text-cream font-display font-semibold text-lg">Tech For Girls</h3>
+                            <span class="text-lilac text-xs font-semibold bg-lilac/10 border border-lilac/20 px-3 py-1 rounded-full">décembre 2025 </span>
+                        </div>
+                        <p class="text-muted text-sm mb-3">Formation en programmation  et robotique .</p>
+                        <div class="flex flex-wrap gap-2 text-[12px] font-semibold">
+                            <span class="text-lilac">#Python</span>
+                           
+                            <span class="text-gold">#Carte Arduino</span>
+                            <span class="text-lilac">#Hubs</span>
+                            <span class="text-rose">#Lego</span>
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+
+
+                <div data-aos="fade-up" data-aos-delay="200" class="relative sm:pl-12">
+                    <div class="hidden sm:flex absolute left-0 top-2 w-8 h-8 rounded-full bg-card border-2 border-gold items-center justify-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-gold"></div>
+                    </div>
+                    <div class="bg-card border border-gold/10 p-6 rounded-2xl shadow-md hover:border-gold/30 transition-colors">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <h3 class="text-cream font-display font-semibold text-lg">  DigiFemme côte d'ivoire</h3>
+                            <span class="text-gold text-xs font-semibold bg-gold/10 border border-gold/20 px-3 py-1 rounded-full"> 2025</span>
+                        </div>
+                        <p class="text-muted text-sm">JA Social Equity</p>
+                    </div>
+                </div>
+
+                <div data-aos="fade-up" data-aos-delay="200" class="relative sm:pl-12">
+                    <div class="hidden sm:flex absolute left-0 top-2 w-8 h-8 rounded-full bg-card border-2 border-gold items-center justify-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-gold"></div>
+                    </div>
+                    <div class="bg-card border border-gold/10 p-6 rounded-2xl shadow-md hover:border-gold/30 transition-colors">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <h3 class="text-cream font-display font-semibold text-lg">Lycée Classique d'Abidjan</h3>
+                            <span class="text-gold text-xs font-semibold bg-gold/10 border border-gold/20 px-3 py-1 rounded-full">2024 — 2025</span>
+                        </div>
+                        <p class="text-muted text-sm">Baccalauréat</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"><div class="sparkle-wrap"><i class="fa-solid fa-gem sparkle-icon text-rose text-sm"></i></div></div>
+
+    <section id="skills" class="py-24 px-6 md:px-16 max-w-7xl mx-auto flex flex-col justify-center relative z-10">
+        <div data-aos="fade-up" class="mb-12">
+            <p class="text-rose uppercase tracking-[0.2em] text-sm font-semibold">Mes Outils</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-cream mt-2">Compétences<span class="text-lilac italic">.</span></h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="bg-card border border-rose/10 p-6 rounded-2xl shadow-md hover:border-rose/30 transition-colors">
+                <h3 class="text-lg font-display font-semibold text-rose mb-4 flex items-center gap-2"><i class="fa-solid fa-desktop"></i> Frontend</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-rose/10 border border-rose/20 text-blush px-3 py-1 rounded-full text-sm">React</span>
+                    <span class="bg-rose/10 border border-rose/20 text-blush px-3 py-1 rounded-full text-sm">Next.js</span>
+                    <span class="bg-rose/10 border border-rose/20 text-blush px-3 py-1 rounded-full text-sm">Vue.js</span>
+                    <span class="bg-rose/10 border border-rose/20 text-blush px-3 py-1 rounded-full text-sm">Tailwind CSS</span>
+                    <span class="bg-rose/10 border border-rose/20 text-blush px-3 py-1 rounded-full text-sm">JavaScript</span>
+                </div>
+            </div>
+            <div class="bg-card border border-lilac/10 p-6 rounded-2xl shadow-md hover:border-lilac/30 transition-colors">
+                <h3 class="text-lg font-display font-semibold text-lilac mb-4 flex items-center gap-2"><i class="fa-solid fa-server"></i> Backend</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-lilac/10 border border-lilac/20 text-blush px-3 py-1 rounded-full text-sm">Node.js</span>
+                    <span class="bg-lilac/10 border border-lilac/20 text-blush px-3 py-1 rounded-full text-sm">Express.js</span>
+                    <span class="bg-lilac/10 border border-lilac/20 text-blush px-3 py-1 rounded-full text-sm">PHP</span>
+                    <span class="bg-lilac/10 border border-lilac/20 text-blush px-3 py-1 rounded-full text-sm">Laravel</span>
+                    <span class="bg-lilac/10 border border-lilac/20 text-blush px-3 py-1 rounded-full text-sm">Inertia.js</span>
+                    <span class="bg-lilac/10 border border-lilac/20 text-blush px-3 py-1 rounded-full text-sm">MongoDB</span>
+                    <span class="bg-lilac/10 border border-lilac/20 text-blush px-3 py-1 rounded-full text-sm">MySQL</span>
+                </div>
+            </div>
+            <div class="bg-card border border-gold/10 p-6 rounded-2xl shadow-md hover:border-gold/30 transition-colors">
+                <h3 class="text-lg font-display font-semibold text-gold mb-4 flex items-center gap-2"><i class="fa-solid fa-mobile-button"></i> Mobile</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-gold/10 border border-gold/20 text-blush px-3 py-1 rounded-full text-sm">React Native</span>
+                    <span class="bg-gold/10 border border-gold/20 text-blush px-3 py-1 rounded-full text-sm">Expo Go</span>
+                </div>
+            </div>
+            <div class="bg-card border border-rose/10 p-6 rounded-2xl shadow-md hover:border-rose/30 transition-colors">
+                <h3 class="text-lg font-display font-semibold text-blush mb-4 flex items-center gap-2"><i class="fa-solid fa-screwdriver-wrench"></i> Outils</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-rose/10 border border-rose/20 text-blush px-3 py-1 rounded-full text-sm">Git</span>
+                    <span class="bg-rose/10 border border-rose/20 text-blush px-3 py-1 rounded-full text-sm">GitHub</span>
+                    <span class="bg-rose/10 border border-rose/20 text-blush px-3 py-1 rounded-full text-sm">Figma</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"><div class="sparkle-wrap"><i class="fa-solid fa-gem sparkle-icon text-rose text-sm"></i></div></div>
+
+    <section id="projects" class="py-24 px-6 md:px-16 max-w-7xl mx-auto min-h-screen flex flex-col justify-center relative z-10">
+        <div data-aos="fade-up">
+            <p class="text-rose uppercase tracking-[0.2em] text-sm font-semibold">Mon travail</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-cream mt-2 mb-6">Projets Académiques<span class="text-lilac italic">.</span></h2>
+            <p class="text-muted max-w-3xl leading-relaxed text-[17px] mb-12">
+                Chaque projet représente une solution unique. Voici mes créations concrètes récentes.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div data-aos="fade-up" class="bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-rose/10 flex flex-col justify-between transition-all hover:border-rose/40 hover:-translate-y-1">
+                <div>
+                    <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
+                        <img src="../portfolio/image/yowl.png" alt="YOWL" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-cream font-display font-bold text-[22px]">YOWL</h3>
+                    <p class="mt-2 text-muted text-[14px]">YOWL réinvente les discussions sur le web en permettant aux utilisateurs de commenter tout contenu Internet depuis une plateforme unique, favorisant ainsi des échanges ouverts et centralisés (projet réalisé avec un groupe de 4 personnes).</p>
+                </div>
+                <div class="mt-5 flex flex-wrap gap-2 text-[12px] font-semibold">
+                    <span class="text-rose">#Laravel & SQL</span>
+                    <span class="text-lilac">#Bootstrap</span>
+                    <span class="text-gold">#CSS</span>
+                </div>
+            </div>
+
+            <div data-aos="fade-up" data-aos-delay="100" class="bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-lilac/10 flex flex-col justify-between transition-all hover:border-lilac/40 hover:-translate-y-1">
+                <div>
+                    <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
+                        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=500" alt="Application cinéma" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-cream font-display font-bold text-[22px]">Rotten Tomaroes </h3>
+                    <p class="mt-2 text-muted text-[14px]">Plateforme de découverte cinématographique explorant les tendances, films populaires et favoris à l'aide de l'API TMDB.</p>
+                </div>
+                <div class="mt-5 flex flex-wrap gap-2 text-[12px] font-semibold">
+                    <span class="text-rose">#Next</span>
+                    <span class="text-lilac">#TMDB_API</span>
+                    <span class="text-gold">#Tailwind</span>
+                </div>
+            </div>
+
+            <div data-aos="fade-up" data-aos-delay="200" class="bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-gold/10 flex flex-col justify-between transition-all hover:border-gold/40 hover:-translate-y-1">
+                <div>
+                    <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
+                        <img src="../portfolio/image/postit.png" alt="Post-it" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-cream font-display font-bold text-[22px]">Post-it</h3>
+                    <p class="mt-2 text-muted text-[14px]">Application de gestion de notes inspirée des post-it numériques, permettant l'ajout, la modification et la suppression de tâches en temps réel.</p>
+                </div>
+                <div class="mt-5 flex flex-wrap gap-2 text-[12px] font-semibold">
+                    <span class="text-rose">#Vue.js</span>
+                    <span class="text-lilac">#CSS</span>
+                    <span class="text-gold">#Consommation d'API</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"><div class="sparkle-wrap"><i class="fa-solid fa-heart sparkle-icon text-gold text-sm"></i></div></div>
+
+    <section id="contact" class="py-24 px-6 md:px-16 max-w-5xl mx-auto min-h-[70vh] flex flex-col justify-center relative z-10">
+        <div data-aos="fade-up" class="text-center max-w-2xl mx-auto mb-16">
+            <p class="text-rose uppercase tracking-[0.2em] text-sm font-semibold">Restons en contact</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-cream mt-2 mb-4">Me joindre<span class="text-lilac italic">.</span></h2>
+            <p class="text-muted text-[17px]">
+                Un projet en tête, une opportunité d'alternance ou juste envie de discuter développement ? Choisis ta plateforme préférée, je réponds très rapidement !
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" data-aos="fade-up" data-aos-delay="100">
+
+            <a href="https://wa.me/2250105458767" target="_blank" rel="noopener"
+               class="bg-card/80 border border-rose/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-4 transition-all hover:border-green-400/50 hover:bg-card group shadow-xl">
+                <div class="w-14 h-14 rounded-full bg-green-400/10 flex items-center justify-center text-3xl text-green-400 group-hover:scale-110 transition-transform">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <div>
+                    <h3 class="text-cream font-display font-semibold text-lg">WhatsApp</h3>
+                    <p class="text-muted text-xs mt-1">Discuter en direct</p>
+                </div>
+            </a>
+
+            <a href="https://www.linkedin.com/in/ange-carmelle-gbedji-1a11b237a" target="_blank" rel="noopener"
+               class="bg-card/80 border border-rose/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-4 transition-all hover:border-rose/50 hover:bg-card group shadow-xl">
+                <div class="w-14 h-14 rounded-full bg-rose/10 flex items-center justify-center text-3xl text-rose group-hover:scale-110 transition-transform">
+                    <i class="fa-brands fa-linkedin"></i>
+                </div>
+                <div>
+                    <h3 class="text-cream font-display font-semibold text-lg">LinkedIn</h3>
+                    <p class="text-muted text-xs mt-1">Réseau pro & CV</p>
+                </div>
+            </a>
+
+            <a href="mailto:carmelle.gbedji@epitech.eu"
+               class="bg-card/80 border border-rose/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-4 transition-all hover:border-lilac/50 hover:bg-card group shadow-xl">
+                <div class="w-14 h-14 rounded-full bg-lilac/10 flex items-center justify-center text-3xl text-lilac group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div>
+                    <h3 class="text-cream font-display font-semibold text-lg">Email</h3>
+                    <p class="text-muted text-xs mt-1">Envoyer un message</p>
+                </div>
+            </a>
+
+            <a href="https://github.com/carmelle1707" target="_blank" rel="noopener"
+               class="bg-card/80 border border-rose/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-4 transition-all hover:border-gold/50 hover:bg-card group shadow-xl">
+                <div class="w-14 h-14 rounded-full bg-gold/10 flex items-center justify-center text-3xl text-gold group-hover:scale-110 transition-transform">
+                    <i class="fa-brands fa-github"></i>
+                </div>
+                <div>
+                    <h3 class="text-cream font-display font-semibold text-lg">GitHub</h3>
+                    <p class="text-muted text-xs mt-1">Voir mes dépôts</p>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <footer class="py-10 text-center border-t border-rose/10 relative z-10">
+        <p class="font-script text-2xl text-blush">Ange Carmelle Gbedji <i class="fa-solid fa-heart text-rose text-sm align-middle"></i></p>
+
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+
+    <script>
+        AOS.init({ duration: 1000, once: true });
+
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const colors = ['rgba(255,111,160,0.55)', 'rgba(201,166,232,0.5)', 'rgba(243,199,126,0.55)'];
+        let sparkles = [];
+        const sparkleCount = 55;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function makeSparkle() {
+            return {
+                x: Math.random() * canvas.width,
+                y: canvas.height + Math.random() * 100,
+                speed: Math.random() * 0.4 + 0.15,
+                drift: (Math.random() - 0.5) * 0.3,
+                radius: Math.random() * 1.8 + 0.6,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                twinklePhase: Math.random() * Math.PI * 2,
+                twinkleSpeed: Math.random() * 0.02 + 0.01
+            };
+        }
+
+        for (let i = 0; i < sparkleCount; i++) {
+            const s = makeSparkle();
+            s.y = Math.random() * canvas.height;
+            sparkles.push(s);
+        }
+
+        function drawStar(x, y, r, opacity, color) {
+            ctx.save();
+            ctx.globalAlpha = opacity;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            sparkles.forEach((s) => {
+                s.y -= s.speed;
+                s.x += s.drift;
+                s.twinklePhase += s.twinkleSpeed;
+
+                const opacity = 0.3 + Math.abs(Math.sin(s.twinklePhase)) * 0.6;
+                drawStar(s.x, s.y, s.radius, opacity, s.color);
+
+                if (s.y < -10) {
+                    Object.assign(s, makeSparkle());
+                    s.y = canvas.height + 10;
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
