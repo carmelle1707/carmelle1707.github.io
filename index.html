@@ -45,7 +45,7 @@
                                radial-gradient(circle at 85% 75%, rgba(255,111,160,0.08), transparent 45%);
         }
 
-        /* Halo doux autour de la photo */
+        /*  point point  de la a côté */
         @keyframes pulse-glow {
             0%, 100% { box-shadow: 0 0 25px rgba(255,111,160,0.35), 0 0 50px rgba(201,166,232,0.25); }
             50% { box-shadow: 0 0 40px rgba(255,111,160,0.55), 0 0 70px rgba(243,199,126,0.35); }
@@ -56,7 +56,7 @@
         @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .charm-ring { animation: spin-slow 30s linear infinite; }
 
-        /* Flottaison des badges */
+        /* faire flotter  les trucs  autour de la photo */
         @keyframes float-slow {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-10px) rotate(3deg); }
@@ -64,7 +64,7 @@
         .tech-orbit { animation: float-slow 6s infinite ease-in-out; }
         .tech-orbit:nth-child(even) { animation-delay: 2s; }
 
-        /* Scintillement des séparateurs de section */
+        /*  rendre les  séparateurs de section la brillant */
         @keyframes twinkle {
             0%, 100% { opacity: 0.6; transform: scale(0.9) rotate(0deg); }
             50% { opacity: 1; transform: scale(1.15) rotate(15deg); }
@@ -86,7 +86,7 @@
             object-position: 50% 18%;
         }
 
-        /* Séparateur signature : ligne dégradée + sparkle */
+        /*  ligne dégradée sparkle */
         .section-divider {
             position: relative;
             height: 1px;
@@ -120,9 +120,10 @@
                  alt="Ange Carmelle"
                  class="profile-photo w-10 h-10 rounded-full object-cover border-2 border-rose">
             <span class="font-script text-xl sm:text-2xl text-blush hidden xs:block">Ange Carmelle</span>
+            <span class="font-script text-2xl text-blush hidden sm:block">Ange Carmelle Gbedji</span>
         </div>
 
-        <!-- Navigation desktop -->
+        <!-- Navigation  -->
         <ul class="hidden lg:flex items-center gap-6 xl:gap-8 font-medium text-base">
             <li><a href="#home" class="text-muted hover:text-rose transition-colors">Accueil</a></li>
             <li><a href="#about" class="text-muted hover:text-rose transition-colors">À propos</a></li>
@@ -137,13 +138,13 @@
             </li>
         </ul>
 
-        <!-- Bouton burger mobile / tablette -->
+        <!-- Bouton pour la responsivité -->
         <button id="menuBtn" aria-label="Ouvrir le menu" class="lg:hidden text-cream text-2xl w-9 h-9 flex items-center justify-center">
             <i id="menuIcon" class="fa-solid fa-bars"></i>
         </button>
     </nav>
 
-    <!-- Menu plein écran mobile / tablette -->
+    <!-- Menu plein écran pour les téléphones  -->
     <div id="mobileMenu" class="fixed inset-0 z-40 bg-ink/98 backdrop-blur-md flex-col items-center justify-center gap-7 hidden">
         <a href="#home" class="mobile-link text-cream text-xl">Accueil</a>
         <a href="#about" class="mobile-link text-cream text-xl">À propos</a>
