@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio - Ange Carmelle Gbedji</title>
+    <title>Portfolio | Ange Carmelle</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -45,7 +45,7 @@
                                radial-gradient(circle at 85% 75%, rgba(255,111,160,0.08), transparent 45%);
         }
 
-        /*  point point  de la a côté */
+        /* Halo doux autour de la photo */
         @keyframes pulse-glow {
             0%, 100% { box-shadow: 0 0 25px rgba(255,111,160,0.35), 0 0 50px rgba(201,166,232,0.25); }
             50% { box-shadow: 0 0 40px rgba(255,111,160,0.55), 0 0 70px rgba(243,199,126,0.35); }
@@ -56,7 +56,7 @@
         @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .charm-ring { animation: spin-slow 30s linear infinite; }
 
-        /* faire flotter  les trucs  autour de la photo */
+        /* Flottaison des badges */
         @keyframes float-slow {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-10px) rotate(3deg); }
@@ -64,7 +64,7 @@
         .tech-orbit { animation: float-slow 6s infinite ease-in-out; }
         .tech-orbit:nth-child(even) { animation-delay: 2s; }
 
-        /*  rendre les  séparateurs de section la brillant */
+        /* Scintillement des séparateurs de section */
         @keyframes twinkle {
             0%, 100% { opacity: 0.6; transform: scale(0.9) rotate(0deg); }
             50% { opacity: 1; transform: scale(1.15) rotate(15deg); }
@@ -86,7 +86,7 @@
             object-position: 50% 18%;
         }
 
-        /*  ligne separation de section  */
+        /* Séparateur signature : ligne dégradée + sparkle */
         .section-divider {
             position: relative;
             height: 1px;
@@ -120,10 +120,9 @@
                  alt="Ange Carmelle"
                  class="profile-photo w-10 h-10 rounded-full object-cover border-2 border-rose">
             <span class="font-script text-xl sm:text-2xl text-blush hidden xs:block">Ange Carmelle</span>
-            <span class="font-script text-2xl text-blush hidden sm:block">Ange Carmelle Gbedji</span>
         </div>
 
-        <!-- Navigation  -->
+        <!-- Navigation desktop -->
         <ul class="hidden lg:flex items-center gap-6 xl:gap-8 font-medium text-base">
             <li><a href="#home" class="text-muted hover:text-rose transition-colors">Accueil</a></li>
             <li><a href="#about" class="text-muted hover:text-rose transition-colors">À propos</a></li>
@@ -132,19 +131,19 @@
             <li><a href="#projects" class="text-muted hover:text-rose transition-colors">Projets</a></li>
             <li><a href="#contact" class="text-muted hover:text-rose transition-colors">Contact</a></li>
             <li>
-                <a href=" mon CV.pdf" download class="bg-gradient-to-r from-rose to-gold hover:opacity-90 text-ink text-sm font-bold py-2 px-4 rounded-full transition-all shadow-md shadow-rose/20">
+                <a href="Ange-Carmelle-Gbedji-v3.pdf" download class="bg-gradient-to-r from-rose to-gold hover:opacity-90 text-ink text-sm font-bold py-2 px-4 rounded-full transition-all shadow-md shadow-rose/20">
                     <i class="fa-solid fa-download mr-1"></i> CV
                 </a>
             </li>
         </ul>
 
-        <!-- Bouton pour la responsivité -->
+        <!-- Bouton burger mobile / tablette -->
         <button id="menuBtn" aria-label="Ouvrir le menu" class="lg:hidden text-cream text-2xl w-9 h-9 flex items-center justify-center">
             <i id="menuIcon" class="fa-solid fa-bars"></i>
         </button>
     </nav>
 
-    <!-- Menu plein écran pour les téléphones  -->
+    <!-- Menu plein écran mobile / tablette -->
     <div id="mobileMenu" class="fixed inset-0 z-40 bg-ink/98 backdrop-blur-md flex-col items-center justify-center gap-7 hidden">
         <a href="#home" class="mobile-link text-cream text-xl">Accueil</a>
         <a href="#about" class="mobile-link text-cream text-xl">À propos</a>
@@ -152,7 +151,7 @@
         <a href="#skills" class="mobile-link text-cream text-xl">Compétences</a>
         <a href="#projects" class="mobile-link text-cream text-xl">Projets</a>
         <a href="#contact" class="mobile-link text-cream text-xl">Contact</a>
-        <a href="Ange-Carmelle-Gbedji.pdf" download class="mobile-link bg-gradient-to-r from-rose to-gold text-ink font-bold py-3 px-8 rounded-full mt-2">
+        <a href="Ange-Carmelle-Gbedji-v3.pdf" download class="mobile-link bg-gradient-to-r from-rose to-gold text-ink font-bold py-3 px-8 rounded-full mt-2">
             <i class="fa-solid fa-download mr-1"></i> Télécharger mon CV
         </a>
     </div>
@@ -232,7 +231,7 @@
                     </div>
                 </div>
 
-                <!-- responsiveo -->
+                <!-- Mobile / tablette : même liste de technos, en pastilles repliées sous la photo -->
                 <div class="flex lg:hidden flex-wrap justify-center gap-2 mt-7 max-w-sm mx-auto">
                     <span class="bg-card/90 border border-rose/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs text-blush"><i class="fa-brands fa-react text-rose"></i> React</span>
                     <span class="bg-card/90 border border-lilac/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs text-blush"><i class="fa-solid fa-n text-lilac"></i> Next.js</span>
@@ -455,8 +454,20 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div data-aos="fade-up" class="bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-rose/10 flex flex-col justify-between transition-all hover:border-rose/40 hover:-translate-y-1">
+        <!-- Flèches de navigation -->
+        <div class="flex items-center justify-end gap-3 mb-6">
+            <button onclick="scrollCarousel(-1)" class="w-10 h-10 rounded-full border border-rose/30 flex items-center justify-center text-muted hover:text-rose hover:border-rose transition-all">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button onclick="scrollCarousel(1)" class="w-10 h-10 rounded-full bg-gradient-to-r from-rose to-lilac flex items-center justify-center text-ink hover:opacity-80 transition-all">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Carousel horizontal -->
+        <div id="projectCarousel" class="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth" style="scrollbar-width: none; -ms-overflow-style: none;">
+
+            <div class="snap-start shrink-0 w-[85vw] sm:w-[380px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-rose/10 flex flex-col justify-between transition-all hover:border-rose/40 hover:-translate-y-1">
                 <div>
                     <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
                         <img src="image/yowl.png" alt="YOWL" class="w-full h-full object-cover">
@@ -465,28 +476,28 @@
                     <p class="mt-2 text-muted text-[14px]">YOWL réinvente les discussions sur le web en permettant aux utilisateurs de commenter tout contenu Internet depuis une plateforme unique, favorisant ainsi des échanges ouverts et centralisés (projet réalisé avec un groupe de 4 personnes).</p>
                 </div>
                 <div class="mt-5 flex flex-wrap gap-2 text-[12px] font-semibold">
-                    <span class="text-rose">#Laravel L</span>
-                    <span class="text-lilac">#SEO</span>
+                    <span class="text-rose">#Laravel</span>
+                    <span class="text-lilac">#SQL</span>
                     <span class="text-gold">#Tailwind</span>
                 </div>
             </div>
 
-            <div data-aos="fade-up" data-aos-delay="100" class="bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-lilac/10 flex flex-col justify-between transition-all hover:border-lilac/40 hover:-translate-y-1">
+            <div class="snap-start shrink-0 w-[85vw] sm:w-[380px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-lilac/10 flex flex-col justify-between transition-all hover:border-lilac/40 hover:-translate-y-1">
                 <div>
                     <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
                         <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=500" alt="Application cinéma" class="w-full h-full object-cover">
                     </div>
-                    <h3 class="text-cream font-display font-bold text-[22px]">Rotten Tomaroes</h3>
+                    <h3 class="text-cream font-display font-bold text-[22px]">Rotten Tomatoes</h3>
                     <p class="mt-2 text-muted text-[14px]">Plateforme de découverte cinématographique explorant les tendances, films populaires et favoris à l'aide de l'API TMDB.</p>
                 </div>
                 <div class="mt-5 flex flex-wrap gap-2 text-[12px] font-semibold">
-                    <span class="text-rose">#Next</span>
+                    <span class="text-rose">#Next.js</span>
                     <span class="text-lilac">#TMDB_API</span>
                     <span class="text-gold">#Tailwind</span>
                 </div>
             </div>
 
-            <div data-aos="fade-up" data-aos-delay="200" class="bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-gold/10 flex flex-col justify-between transition-all hover:border-gold/40 hover:-translate-y-1">
+            <div class="snap-start shrink-0 w-[85vw] sm:w-[380px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-gold/10 flex flex-col justify-between transition-all hover:border-gold/40 hover:-translate-y-1">
                 <div>
                     <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
                         <img src="image/postit.png" alt="Post-it" class="w-full h-full object-cover">
@@ -501,27 +512,30 @@
                 </div>
             </div>
 
-
-             <div data-aos="fade-up" data-aos-delay="200" class="bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-gold/10 flex flex-col justify-between transition-all hover:border-gold/40 hover:-translate-y-1">
+            <div class="snap-start shrink-0 w-[85vw] sm:w-[380px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-rose/10 flex flex-col justify-between transition-all hover:border-rose/40 hover:-translate-y-1">
                 <div>
                     <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
-                        <img src="image/flot .png" alt="Post-it" class="w-full h-full object-cover">
+                        <img src="image/flot.png" alt="Flot MOM" class="w-full h-full object-cover">
                     </div>
-                    <h3 class="text-cream font-display font-bold text-[22px]">onglet MOM du global reporting de l'entreprise flot</h3>
-                    <p class="mt-2 text-muted text-[14px]">interface de l'onglet MOM realisé selon la marquette présenté par l'equipe de flot , permettant la centralisation des données par mois.</p>
+                    <h3 class="text-cream font-display font-bold text-[22px]">Flot — MOM Global Reporting</h3>
+                    <p class="mt-2 text-muted text-[14px]">Interface de l'onglet MOM réalisée selon la maquette présentée par l'équipe Flot, permettant la centralisation des données mensuelles.</p>
                 </div>
                 <div class="mt-5 flex flex-wrap gap-2 text-[12px] font-semibold">
                     <span class="text-rose">#Vue.js</span>
-                    <span class="text-lilac">#laravel</span>
-                    <span class="text-lilac">#tailwind</span>
-                    <span class="text-lilac">#inertia</span>
-                    <span class="text-gold">#Consommation d'API</span>
+                    <span class="text-lilac">#Laravel</span>
+                    <span class="text-gold">#Tailwind</span>
+                    <span class="text-lilac">#Inertia</span>
                 </div>
             </div>
 
+        </div>
 
-
-
+        <!-- Points indicateurs -->
+        <div id="carouselDots" class="flex justify-center gap-2 mt-6">
+            <button onclick="goToSlide(0)" class="dot w-2.5 h-2.5 rounded-full bg-rose transition-all duration-300"></button>
+            <button onclick="goToSlide(1)" class="dot w-2.5 h-2.5 rounded-full bg-muted/30 transition-all duration-300"></button>
+            <button onclick="goToSlide(2)" class="dot w-2.5 h-2.5 rounded-full bg-muted/30 transition-all duration-300"></button>
+            <button onclick="goToSlide(3)" class="dot w-2.5 h-2.5 rounded-full bg-muted/30 transition-all duration-300"></button>
         </div>
     </section>
 
@@ -687,6 +701,54 @@
             requestAnimationFrame(animate);
         }
         animate();
+    </script>
+
+    <script>
+        // ---- Carousel horizontal projets ----
+        const carousel = document.getElementById('projectCarousel');
+        const dots = document.querySelectorAll('.dot');
+        const CARD_WIDTH = carousel ? carousel.querySelector('.snap-start').offsetWidth + 24 : 400;
+
+        function updateDots() {
+            if (!carousel) return;
+            const idx = Math.round(carousel.scrollLeft / (carousel.querySelector('.snap-start').offsetWidth + 24));
+            dots.forEach((d, i) => {
+                if (i === idx) {
+                    d.classList.add('bg-rose', 'w-5');
+                    d.classList.remove('bg-muted/30', 'w-2.5');
+                } else {
+                    d.classList.remove('bg-rose', 'w-5');
+                    d.classList.add('bg-muted/30', 'w-2.5');
+                }
+            });
+        }
+
+        function scrollCarousel(dir) {
+            if (!carousel) return;
+            const card = carousel.querySelector('.snap-start');
+            const amount = card.offsetWidth + 24;
+            carousel.scrollBy({ left: dir * amount, behavior: 'smooth' });
+        }
+
+        function goToSlide(idx) {
+            if (!carousel) return;
+            const card = carousel.querySelector('.snap-start');
+            carousel.scrollTo({ left: idx * (card.offsetWidth + 24), behavior: 'smooth' });
+        }
+
+        if (carousel) {
+            carousel.addEventListener('scroll', updateDots);
+            // Drag to scroll (desktop)
+            let isDown = false, startX, scrollLeft;
+            carousel.addEventListener('mousedown', e => { isDown = true; startX = e.pageX - carousel.offsetLeft; scrollLeft = carousel.scrollLeft; carousel.style.cursor = 'grabbing'; });
+            carousel.addEventListener('mouseleave', () => { isDown = false; carousel.style.cursor = ''; });
+            carousel.addEventListener('mouseup', () => { isDown = false; carousel.style.cursor = ''; });
+            carousel.addEventListener('mousemove', e => {
+                if (!isDown) return;
+                e.preventDefault();
+                carousel.scrollLeft = scrollLeft - (e.pageX - carousel.offsetLeft - startX);
+            });
+        }
     </script>
 </body>
 </html>
