@@ -71,6 +71,7 @@
         }
         .sparkle-icon { animation: twinkle 3s ease-in-out infinite; }
 
+        #projectCarousel::-webkit-scrollbar { display: none; }
         #bgCanvas {
             position: fixed;
             top: 0; left: 0;
@@ -445,7 +446,7 @@
 
     <div class="section-divider max-w-7xl mx-auto"><div class="sparkle-wrap"><i class="fa-solid fa-gem sparkle-icon text-rose text-sm"></i></div></div>
 
-    <section id="projects" class="py-20 sm:py-24 px-6 md:px-16 max-w-7xl mx-auto min-h-screen flex flex-col justify-center relative z-10">
+    <section id="projects" class="py-20 sm:py-24 px-6 md:px-16 max-w-7xl mx-auto flex flex-col justify-center relative z-10">
         <div data-aos="fade-up">
             <p class="text-rose uppercase tracking-[0.2em] text-sm font-semibold">Mon travail</p>
             <h2 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-cream mt-2 mb-6">Projets Académiques<span class="text-lilac italic">.</span></h2>
@@ -465,9 +466,9 @@
         </div>
 
         <!-- Carousel horizontal -->
-        <div id="projectCarousel" class="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <div id="projectCarousel" class="flex flex-nowrap gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth" style="scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;">
 
-            <div class="snap-start shrink-0 w-[85vw] sm:w-[380px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-rose/10 flex flex-col justify-between transition-all hover:border-rose/40 hover:-translate-y-1">
+            <div class="snap-start shrink-0 w-[82vw] sm:w-[340px] lg:w-[360px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-rose/10 flex flex-col justify-between transition-all hover:border-rose/40 hover:-translate-y-1">
                 <div>
                     <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
                         <img src="image/yowl.png" alt="YOWL" class="w-full h-full object-cover">
@@ -482,7 +483,7 @@
                 </div>
             </div>
 
-            <div class="snap-start shrink-0 w-[85vw] sm:w-[380px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-lilac/10 flex flex-col justify-between transition-all hover:border-lilac/40 hover:-translate-y-1">
+            <div class="snap-start shrink-0 w-[82vw] sm:w-[340px] lg:w-[360px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-lilac/10 flex flex-col justify-between transition-all hover:border-lilac/40 hover:-translate-y-1">
                 <div>
                     <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
                         <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=500" alt="Application cinéma" class="w-full h-full object-cover">
@@ -497,7 +498,7 @@
                 </div>
             </div>
 
-            <div class="snap-start shrink-0 w-[85vw] sm:w-[380px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-gold/10 flex flex-col justify-between transition-all hover:border-gold/40 hover:-translate-y-1">
+            <div class="snap-start shrink-0 w-[82vw] sm:w-[340px] lg:w-[360px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-gold/10 flex flex-col justify-between transition-all hover:border-gold/40 hover:-translate-y-1">
                 <div>
                     <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
                         <img src="image/postit.png" alt="Post-it" class="w-full h-full object-cover">
@@ -512,7 +513,7 @@
                 </div>
             </div>
 
-            <div class="snap-start shrink-0 w-[85vw] sm:w-[380px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-rose/10 flex flex-col justify-between transition-all hover:border-rose/40 hover:-translate-y-1">
+            <div class="snap-start shrink-0 w-[82vw] sm:w-[340px] lg:w-[360px] bg-card/90 backdrop-blur-sm p-5 rounded-2xl border border-rose/10 flex flex-col justify-between transition-all hover:border-rose/40 hover:-translate-y-1">
                 <div>
                     <div class="relative w-full h-[200px] overflow-hidden rounded-2xl mb-5">
                         <img src="image/flot.png" alt="Flot MOM" class="w-full h-full object-cover">
