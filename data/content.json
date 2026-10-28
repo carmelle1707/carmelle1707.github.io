@@ -1,0 +1,149 @@
+{
+  "profile": {
+    "name": "Ange Carmelle Gbedji",
+    "shortName": "Ange Carmelle",
+    "role": "Développeuse web & mobile",
+    "available": true,
+    "status": "Disponible pour de nouveaux projets",
+    "headline": "Je crée des sites et des apps mobiles qui font *travailler votre business*.",
+    "lead": "Développeuse web et mobile freelance à Abidjan. J'aide les commerces, PME et startups à être trouvés en ligne, à présenter leurs services et à recevoir des demandes de clients, sur ordinateur comme sur téléphone.",
+    "photo": "image/photo-shooting-lps.jpeg",
+    "location": "Abidjan, CI",
+    "language": "Français",
+    "response": "sous 24 h",
+    "badge": "Web · Mobile · Freelance · Abidjan · ",
+    "cv": "mon CV.pdf"
+  },
+  "contact": {
+    "title": "Un projet en tête ? *Parlons-en.*",
+    "text": "Décrivez-moi votre activité et ce que vous voulez obtenir. Je vous réponds sous 24 h avec des questions et une première estimation.",
+    "whatsapp": "+225 01 05 45 87 67",
+    "email": "",
+    "linkedin": "https://www.linkedin.com/in/ange-carmelle-gbedji-1a11b237a",
+    "github": "https://github.com/carmelle1707"
+  },
+  "marquee": ["Sites vitrines", "Applications web", "Apps mobiles", "Sur mesure"],
+  "services": [
+    {
+      "icon": "web",
+      "title": "Site vitrine",
+      "desc": "Un site rapide et clair qui présente votre activité et transforme les visiteurs en contacts.",
+      "features": [
+        "Design adapté au mobile",
+        "Bouton WhatsApp et formulaire de contact",
+        "Localisation Google Maps",
+        "Mise en ligne et nom de domaine"
+      ],
+      "for": "restaurants, salons, cabinets, écoles, ONG"
+    },
+    {
+      "icon": "app",
+      "title": "Application web",
+      "desc": "Une plateforme sur mesure pour gérer vos données, vos clients ou vos réservations.",
+      "features": [
+        "Espace d'administration",
+        "Comptes utilisateurs",
+        "Tableaux de bord et rapports",
+        "Base de données sécurisée"
+      ],
+      "for": "PME, startups, associations"
+    },
+    {
+      "icon": "mobile",
+      "title": "Application mobile",
+      "desc": "Une app Android et iOS à partir d'un seul code, pour être directement dans la poche de vos clients.",
+      "features": [
+        "Développement React Native",
+        "Connexion à votre site ou API",
+        "Tests sur vrais téléphones",
+        "Accompagnement à la publication"
+      ],
+      "for": "services, livraisons, communautés"
+    }
+  ],
+  "steps": [
+    {
+      "title": "Échange",
+      "desc": "On parle de votre activité, de vos clients et de vos objectifs. Je vous envoie ensuite un devis clair."
+    },
+    {
+      "title": "Maquette",
+      "desc": "Je dessine les pages sur Figma. Vous validez le rendu avant que je commence à coder."
+    },
+    {
+      "title": "Développement",
+      "desc": "Je construis le site ou l'app et je vous partage un lien de test pour vos retours."
+    },
+    {
+      "title": "Mise en ligne",
+      "desc": "Je publie le projet, je vous montre comment l'utiliser et je reste disponible après livraison."
+    }
+  ],
+  "projects": [
+    {
+      "title": "Flot — MOM Global Reporting",
+      "tag": "Brief équipe Flot · Interface de reporting",
+      "desc": "Module qui centralise les données mensuelles d'une organisation dans un seul tableau de bord, développé d'après la maquette fournie par l'équipe Flot.",
+      "role": "Intégration de la maquette, connexion aux données via l'API, mise en page responsive.",
+      "stack": ["Vue.js", "Laravel", "Inertia", "Tailwind"],
+      "image": "image/flot .png",
+      "github": "https://github.com/carmelle1707",
+      "demo": ""
+    },
+    {
+      "title": "YOWL",
+      "tag": "Projet d'équipe · 4 développeurs",
+      "desc": "Plateforme qui permet de commenter n'importe quel contenu du web depuis un seul endroit, pour centraliser les discussions.",
+      "role": "Développement de fonctionnalités Laravel, base de données SQL et interface en Tailwind.",
+      "stack": ["Laravel", "SQL", "Tailwind"],
+      "image": "image/yowl.png",
+      "github": "https://github.com/carmelle1707",
+      "demo": ""
+    },
+    {
+      "title": "CinéScope",
+      "tag": "Application web · API externe",
+      "desc": "Application de découverte de films : tendances, films populaires et favoris, alimentée en temps réel par l'API TMDB.",
+      "role": "Consommation d'API, rendu côté serveur avec Next.js, interface responsive.",
+      "stack": ["Next.js", "API TMDB", "Tailwind"],
+      "image": "image/cinescope.png",
+      "github": "https://github.com/carmelle1707",
+      "demo": ""
+    },
+    {
+      "title": "Post-it",
+      "tag": "Application web · Productivité",
+      "desc": "Gestionnaire de notes façon post-it : ajout, modification et suppression de tâches mises à jour en temps réel.",
+      "role": "Composants Vue réutilisables, échanges avec une API.",
+      "stack": ["Vue.js", "CSS", "API REST"],
+      "image": "image/postit.png",
+      "github": "https://github.com/carmelle1707",
+      "demo": ""
+    }
+  ],
+  "skills": [
+    { "group": "Front-end", "items": ["React", "Next.js", "Vue.js", "Tailwind CSS", "JavaScript"] },
+    { "group": "Back-end", "items": ["Laravel", "PHP", "Node.js", "Express", "Inertia.js"] },
+    { "group": "Données", "items": ["MySQL", "MongoDB"] },
+    { "group": "Mobile", "items": ["React Native", "Expo"] },
+    { "group": "Outils", "items": ["Git", "GitHub", "Figma", "Vercel"] }
+  ],
+  "education": [
+    {
+      "period": "2026 →",
+      "title": "WeCode",
+      "desc": "Formation développement full stack et mobile par projets concrets : front-end, back-end, API et bases de données."
+    },
+    {
+      "period": "2025 →",
+      "title": "Université Virtuelle de Côte d'Ivoire",
+      "desc": "Licence Développement d'Applications et E-services (en cours)."
+    },
+    {
+      "period": "2025",
+      "title": "Tech For Girls",
+      "desc": "Programmation Python et robotique Arduino."
+    },
+    { "period": "2025", "title": "DigiFemme Côte d'Ivoire", "desc": "Programme JA Social Equity." }
+  ]
+}

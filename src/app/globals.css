@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+/* Le thème sombre suit le système, sauf si data-theme est forcé sur <html> */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --ink: #0f1b2d;
+  --muted: #556275;
+  --line: #dde2ea;
+  --accent: #a8761f;
+  --accent-ink: #0f1b2d;
+  --gold: #d2a44a;
+  --second: #2f5d8a;
+  --band: #0f1b2d;
+  --band-ink: #eef1f6;
+  --band-muted: #9aa7bb;
+  --band-dim: #26354d;
+  --ok: #1f8a5b;
+  --danger: #b42335;
+  --grain: 0.045;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1220;
+    --surface: #111a2b;
+    --ink: #eef1f6;
+    --muted: #9aa7bb;
+    --line: #223049;
+    --accent: #d9ad5b;
+    --accent-ink: #0b1220;
+    --gold: #d9ad5b;
+    --second: #8fb3e0;
+    --band: #0f1a2e;
+    --ok: #45c08a;
+    --danger: #ff6b7d;
+    --grain: 0;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #111a2b;
+  --ink: #eef1f6;
+  --muted: #9aa7bb;
+  --line: #223049;
+  --accent: #d9ad5b;
+  --accent-ink: #0b1220;
+  --gold: #d9ad5b;
+  --second: #8fb3e0;
+  --band: #0f1a2e;
+  --ok: #45c08a;
+  --danger: #ff6b7d;
+  --grain: 0;
+  color-scheme: dark;
+}
+
+/* Sur fond bleu nuit, l'accent devient le doré clair */
+.band {
+  --accent: var(--gold);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-gold: var(--gold);
+  --color-second: var(--second);
+  --color-band: var(--band);
+  --color-band-ink: var(--band-ink);
+  --color-band-muted: var(--band-muted);
+  --color-band-dim: var(--band-dim);
+  --color-ok: var(--ok);
+  --color-danger: var(--danger);
+  --color-night: #0f1b2d;
+
+  --font-display: var(--font-bricolage), "Arial Narrow", system-ui, sans-serif;
+  --font-serif: var(--font-instrument), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-figtree), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, Menlo, Consolas, monospace;
+
+  --radius-card: 14px;
+  --radius-xl2: 22px;
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-out-strong: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--gold);
+    color: #0f1b2d;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  /* Mots entourés d'*étoiles* dans les titres */
+  h1 em,
+  h2 em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+  }
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
