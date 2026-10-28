@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { themeScript } from "@/components/site/theme-toggle";
 import { fontVariables } from "@/lib/fonts";
 import "./globals.css";
 
@@ -21,6 +22,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr" className={fontVariables} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );
