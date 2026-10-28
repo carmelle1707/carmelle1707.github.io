@@ -1,105 +1,75 @@
-import { useEffect, useState } from 'react'
-
-const LOADING_DURATION_MS = 5600
-const READY_DURATION_MS = 1100
-const EXIT_DURATION_MS = 750
+import { useEffect, useRef, useState } from 'react'
 
 const messages = [
-  { text: 'Initializing Carmelle.exe...', threshold: 5 },
-  { text: 'Loading creativity...', threshold: 23 },
-  { text: 'Loading projects...', threshold: 41 },
-  { text: 'Connecting to AI...', threshold: 59 },
-  { text: 'Exploring new technologies...', threshold: 77 },
+  'Opening my sketchbook…',
+  'Mixing ideas with code…',
+  'Following my curiosity…',
+  'Okay, come on in.',
 ]
 
-function Loader({ onComplete }) {
-  const [progress, setProgress] = useState(0)
-  const [isExiting, setIsExiting] = useState(false)
+// Environ 3 s : quatre messages de 650 ms, puis 450 ms de fondu.
+const TIMINGS = {
+  default: { step: 650, exit: 450 },
+  reducedMotion: { step: 250, exit: 0 },
+}
+
+const DISMISS_EVENTS = ['wheel', 'touchstart', 'keydown', 'pointerdown']
+
+function Loader({ onExit, onDone }) {
+  const [index, setIndex] = useState(0)
+  const [isLeaving, setIsLeaving] = useState(false)
+  const [timing] = useState(() =>
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? TIMINGS.reducedMotion
+      : TIMINGS.default,
+  )
+  const leaveRef = useRef(() => setIsLeaving(true))
 
   useEffect(() => {
-    const startTime = performance.now()
-    const intervalId = window.setInterval(() => {
-      const elapsed = performance.now() - startTime
-      const nextProgress = Math.min(
-        Math.floor((elapsed / LOADING_DURATION_MS) * 100),
-        100,
-      )
+    const timers = messages.slice(1).map((_, i) =>
+      window.setTimeout(() => setIndex(i + 1), (i + 1) * timing.step),
+    )
+    timers.push(window.setTimeout(leaveRef.current, messages.length * timing.step))
 
-      setProgress(nextProgress)
+    return () => timers.forEach(window.clearTimeout)
+  }, [timing])
 
-      if (nextProgress === 100) {
-        window.clearInterval(intervalId)
-      }
-    }, 40)
-
-    return () => window.clearInterval(intervalId)
+  // Le loader ne retient jamais le visiteur : le moindre geste le fait partir.
+  useEffect(() => {
+    const leave = leaveRef.current
+    DISMISS_EVENTS.forEach((type) => window.addEventListener(type, leave, { passive: true }))
+    return () => DISMISS_EVENTS.forEach((type) => window.removeEventListener(type, leave))
   }, [])
 
   useEffect(() => {
-    if (progress < 100) return undefined
-
-    const exitTimer = window.setTimeout(
-      () => setIsExiting(true),
-      READY_DURATION_MS,
-    )
-    const completeTimer = window.setTimeout(
-      onComplete,
-      READY_DURATION_MS + EXIT_DURATION_MS,
-    )
-
-    return () => {
-      window.clearTimeout(exitTimer)
-      window.clearTimeout(completeTimer)
-    }
-  }, [onComplete, progress])
-
-  const activeMessage = messages
-    .filter((message) => progress >= message.threshold)
-    .at(-1)
+    if (!isLeaving) return undefined
+    onExit()
+    const timer = window.setTimeout(onDone, timing.exit)
+    return () => window.clearTimeout(timer)
+  }, [isLeaving, onDone, onExit, timing])
 
   return (
-    <main
-      aria-label="Chargement de Carmelle"
-      className={`fixed inset-0 z-50 flex min-h-[100svh] items-center overflow-y-auto bg-[#191416] px-6 py-12 text-[#F2ECE6] transition-opacity duration-700 ease-out motion-reduce:transition-none sm:px-12 sm:py-16 ${
-        isExiting ? 'pointer-events-none opacity-0' : 'opacity-100'
+    <div
+      className={`fixed inset-0 z-50 flex items-center bg-plum px-6 transition-opacity duration-[450ms] ease-out motion-reduce:transition-none sm:px-12 ${
+        isLeaving ? 'pointer-events-none opacity-0' : 'opacity-100'
       }`}
+      lang="en"
+      role="status"
     >
-      <section className="mx-auto w-full max-w-4xl">
-        <div className="mt-24 max-w-xl sm:mt-32">
-          <p
-            aria-live="polite"
-            className="min-h-7 font-sans text-base text-[#F2ECE6]/80 sm:text-lg"
-          >
-            {progress === 100 ? (
-              'SYSTEM READY'
-            ) : activeMessage ? (
-              <span key={activeMessage.text} className="log-enter inline-block">
-                {activeMessage.text}
-              </span>
-            ) : null}
-          </p>
-
-          <div className="mt-7 flex max-w-xs items-center gap-3 sm:mt-8">
-          <div
-            aria-label="Progression du chargement"
-            aria-valuemax={100}
-            aria-valuemin={0}
-            aria-valuenow={progress}
-            className="h-px flex-1 bg-[#F2ECE6]/20"
-            role="progressbar"
-          >
-            <span
-              className="block h-full bg-[#C8796A] transition-[width] duration-100 ease-linear"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-            <span className="w-9 text-right font-sans text-xs tabular-nums text-[#F2ECE6]/60">
-              {progress}%
-            </span>
-          </div>
-        </div>
-      </section>
-    </main>
+      <div className="mx-auto w-full max-w-md">
+        <p className="min-h-[1.3em] font-serif text-[1.75rem] font-light italic leading-tight sm:text-4xl">
+          <span className="loader-message inline-block" key={messages[index]}>
+            {messages[index]}
+          </span>
+        </p>
+        <span aria-hidden="true" className="mt-6 block h-px bg-ivory/15">
+          <span
+            className="loader-stroke block h-full bg-coral"
+            style={{ '--loader-duration': `${messages.length * timing.step}ms` }}
+          />
+        </span>
+      </div>
+    </div>
   )
 }
 
