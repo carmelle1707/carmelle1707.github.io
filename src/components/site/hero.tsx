@@ -64,7 +64,7 @@ export function Hero({ profile, contact }: Pick<SiteContent, "profile" | "contac
         </div>
 
         <div className="relative max-w-[340px] min-[861px]:max-w-none">
-          <div className="photo">
+          <div className="photo" data-speed="-0.06">
             {profile.photo ? (
               <div className="photo-inner">
                 <Image
@@ -92,7 +92,7 @@ export function Hero({ profile, contact }: Pick<SiteContent, "profile" | "contac
               <circle className="core" cx="60" cy="60" r="7" />
             </svg>
           )}
-          <dl className="fiche" aria-label="Infos pratiques">
+          <dl className="fiche" aria-label="Infos pratiques" data-speed="0.08">
             {profile.location && (
               <div>
                 <dt>Basée à</dt>

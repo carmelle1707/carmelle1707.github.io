@@ -7,6 +7,7 @@ import { Projects } from "@/components/site/projects";
 import { Services } from "@/components/site/services";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { SiteMotion } from "@/components/site/site-motion";
 import { getSiteContent } from "@/lib/content";
 
 export default async function HomePage() {
@@ -25,6 +26,7 @@ export default async function HomePage() {
         <ContactSection contact={c.contact} profile={c.profile} />
       </main>
       <SiteFooter name={c.profile.name} />
+      <SiteMotion />
     </>
   );
 }

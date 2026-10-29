@@ -322,6 +322,14 @@
     animation: word-in 1s var(--ease-out-soft) both;
     animation-delay: calc(var(--wi, 0) * 55ms + 250ms);
   }
+  /* Titres de section : data-split passe de "wait" à "in" quand le titre entre à l'écran */
+  [data-split] .wi {
+    transition: transform 1s var(--ease-out-soft);
+    transition-delay: calc(var(--wi, 0) * 55ms);
+  }
+  [data-split="wait"] .wi {
+    transform: translateY(115%) rotate(4deg);
+  }
 
   /* Bandeau */
   .marquee {
@@ -632,6 +640,28 @@
     opacity: 0.8;
   }
 
+  /*
+   * Apparitions en cascade : data-reveal passe à "wait" puis "in" par le script, jamais sans JS.
+   * Placé après les cartes pour que cette transition l'emporte pendant l'entrée.
+   */
+  [data-reveal="wait"],
+  [data-reveal="in"] {
+    transition:
+      opacity 1s var(--ease-out-soft),
+      transform 1s var(--ease-out-soft);
+    transition-delay: calc(var(--d, 0) * 120ms);
+  }
+  [data-reveal="wait"] {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  .proj[data-reveal] .shot {
+    transition: clip-path 1.2s var(--ease-in-out-strong) 0.2s;
+  }
+  .proj[data-reveal="wait"] .shot {
+    clip-path: inset(0 100% 0 0 round 14px);
+  }
+
   /* Barre de progression */
   .progress {
     position: fixed;
@@ -640,6 +670,7 @@
     width: 100%;
     height: 3px;
     background: var(--gold);
+    transform: scaleX(0);
     transform-origin: 0 50%;
     z-index: 12;
     pointer-events: none;
@@ -703,6 +734,14 @@
   }
   .cursor[data-mode="view"] b {
     opacity: 1;
+  }
+  .cursor[data-hidden="true"],
+  .cursor-dot[data-hidden="true"] {
+    opacity: 0;
+  }
+  :root:not(.has-cursor) .cursor,
+  :root:not(.has-cursor) .cursor-dot {
+    display: none;
   }
   .has-cursor,
   .has-cursor a,
