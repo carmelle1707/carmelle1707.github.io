@@ -18,7 +18,9 @@ import { connectDb } from "./db";
 
 export const SITE_CONTENT_TAG = "site-content";
 
-const fallback = () => siteContentFromFile(contentFileSchema.parse(contentJson));
+/** Contenu de départ (data/content.json), affiché tant que la base est vide. */
+export const starterContent = () => siteContentFromFile(contentFileSchema.parse(contentJson));
+const fallback = starterContent;
 const media = (m: { url: string; pathname?: string | null } | null | undefined) =>
   m ? { url: m.url, pathname: m.pathname ?? "" } : null;
 

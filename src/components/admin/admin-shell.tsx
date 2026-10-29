@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { logout } from "@/actions/auth";
+import { AdminNav } from "./admin-nav";
 
 export function AdminShell({ email, children }: { email: string; children: React.ReactNode }) {
   return (
@@ -22,6 +23,7 @@ export function AdminShell({ email, children }: { email: string; children: React
           </div>
         </div>
       </header>
+      <AdminNav />
       <main className="mx-auto max-w-[1120px] px-5 py-10">{children}</main>
     </>
   );
