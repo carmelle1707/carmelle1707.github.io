@@ -46,5 +46,5 @@ export function useAdminForm(action: Action) {
   );
 
   const errors = state.status === "error" ? state.fieldErrors : {};
-  return { formRef, onSubmit, pending, ready, errors };
+  return { formRef, onSubmit, pending, ready, errors, state };
 }

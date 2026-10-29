@@ -131,6 +131,62 @@
   .admin-btn-primary:hover {
     background: color-mix(in srgb, var(--ink) 85%, var(--second));
   }
+  .admin-btn-danger {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+  }
+  .admin-btn-danger:hover {
+    background: color-mix(in srgb, var(--danger) 85%, #000);
+  }
+
+  .admin-dialog {
+    width: min(440px, calc(100vw - 32px));
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .admin-dialog::backdrop {
+    background: rgb(15 27 45 / 0.45);
+  }
+
+  /* Ligne d'une liste réordonnable */
+  .sort-row {
+    background: var(--surface);
+  }
+  .sort-row[data-dragging="true"] {
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 10px 30px -12px rgb(15 27 45 / 0.45);
+    outline: 2px solid var(--second);
+  }
+  .drag-handle {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 44px;
+    flex: none;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    cursor: grab;
+    touch-action: none;
+  }
+  .drag-handle:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+  }
+  .drag-handle:active {
+    cursor: grabbing;
+  }
+  .drag-handle:focus-visible {
+    outline: 2px solid var(--second);
+  }
+
   .admin-btn-quiet {
     border-color: transparent;
     background: transparent;

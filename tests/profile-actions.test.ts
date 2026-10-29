@@ -70,7 +70,10 @@ describe("saveProfile", () => {
   });
 
   it("renvoie les erreurs par champ sans rien enregistrer", async () => {
-    const res = await saveProfile(idleState, profileForm({ name: "", "photo.url": "javascript:x" }));
+    const res = await saveProfile(
+      idleState,
+      profileForm({ name: "", "photo.url": "javascript:x" }),
+    );
     expect(res.status).toBe("error");
     if (res.status !== "error") return;
     expect(res.fieldErrors.name).toBe("Le nom est requis.");

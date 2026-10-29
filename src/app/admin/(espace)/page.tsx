@@ -18,11 +18,19 @@ export default async function DashboardPage() {
       label: "Projets",
       value: `${plural(d.published, "publié", "publiés")}, ${plural(d.drafts, "brouillon", "brouillons")}`,
     },
-    { label: "Services", value: plural(d.services, "service", "services") },
-    { label: "Méthode", value: plural(d.steps, "étape", "étapes") },
-    { label: "Compétences", value: plural(d.skills, "catégorie", "catégories") },
-    { label: "Parcours", value: plural(d.education, "entrée", "entrées") },
-    { label: "Bandeau défilant", value: plural(d.words, "mot", "mots") },
+    {
+      label: "Services",
+      value: plural(d.services, "service", "services"),
+      href: "/admin/services",
+    },
+    { label: "Méthode", value: plural(d.steps, "étape", "étapes"), href: "/admin/methode" },
+    {
+      label: "Compétences",
+      value: plural(d.skills, "catégorie", "catégories"),
+      href: "/admin/competences",
+    },
+    { label: "Parcours", value: plural(d.education, "entrée", "entrées"), href: "/admin/parcours" },
+    { label: "Bandeau défilant", value: plural(d.words, "mot", "mots"), href: "/admin/bandeau" },
   ];
 
   return (

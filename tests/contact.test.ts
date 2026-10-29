@@ -83,7 +83,11 @@ describe("submitContact", () => {
 
 describe("contactMailText", () => {
   it("met les libellés lisibles et signale un budget absent", () => {
-    const text = contactMailText({ ...valid, projectType: "application-mobile", budget: undefined });
+    const text = contactMailText({
+      ...valid,
+      projectType: "application-mobile",
+      budget: undefined,
+    });
     expect(text).toContain("Projet : Application mobile");
     expect(text).toContain("Budget : non précisé");
     expect(text).toContain(valid.message);

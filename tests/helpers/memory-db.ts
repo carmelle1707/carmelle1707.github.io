@@ -7,7 +7,9 @@ export function setupMemoryDb() {
   let server: MongoMemoryServer;
 
   beforeAll(async () => {
-    server = await MongoMemoryServer.create();
+    // Plusieurs fichiers de test démarrent leur base en même temps : on laisse du temps
+    // aux machines chargées (10 s par défaut)
+    server = await MongoMemoryServer.create({ instance: { launchTimeout: 60_000 } });
     process.env.MONGODB_URI = server.getUri("portfolio-test");
     await mongoose.connect(process.env.MONGODB_URI);
     await mongoose.connection.syncIndexes();
