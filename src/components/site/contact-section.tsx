@@ -1,6 +1,7 @@
 import type { SiteContent } from "@/lib/content-types";
 import { githubHandle, whatsappLink } from "@/lib/links";
 import { RichTitle, stripEmphasis } from "@/lib/rich-title";
+import { ContactForm } from "./contact-form";
 
 function Arrow() {
   return (
@@ -66,6 +67,22 @@ export function ContactSection({ contact, profile }: Pick<SiteContent, "contact"
               <span>{githubHandle(contact.github)}</span>
             </a>
           )}
+        </div>
+      </div>
+
+      <div className="wrap mt-20">
+        <div className="grid gap-10 border-t border-band-dim pt-14 min-[861px]:grid-cols-[1fr_1.6fr] min-[861px]:gap-16">
+          <div data-reveal>
+            <h3 className="text-[clamp(26px,3vw,34px)] font-extrabold">
+              Ou décrivez-moi{" "}
+              <em className="font-serif font-normal text-gold italic">votre projet</em>
+            </h3>
+            <p className="mt-3 max-w-[38ch] text-band-muted">
+              Quelques lignes suffisent. Je reçois votre message par email et je vous réponds
+              directement.
+            </p>
+          </div>
+          <ContactForm />
         </div>
       </div>
     </section>
