@@ -1,0 +1,76 @@
+/*
+ * Admin : un outil de travail, pas une vitrine. Mêmes couleurs et polices que le site,
+ * mais sans effets : contrastes nets, coins modérés, états de focus et d'erreur explicites.
+ */
+@reference "../globals.css";
+
+@layer components {
+  .admin-input {
+    width: 100%;
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 11px 13px;
+    transition: border-color 0.2s;
+  }
+  .admin-input:hover {
+    border-color: color-mix(in srgb, var(--ink) 30%, var(--line));
+  }
+  .admin-input:focus {
+    border-color: var(--second);
+    outline: 2px solid color-mix(in srgb, var(--second) 25%, transparent);
+    outline-offset: 0;
+  }
+  .admin-input[aria-invalid="true"] {
+    border-color: var(--danger);
+  }
+
+  .admin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      border-color 0.2s,
+      color 0.2s;
+  }
+  .admin-btn:hover {
+    border-color: color-mix(in srgb, var(--ink) 35%, var(--line));
+  }
+  .admin-btn:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .admin-btn-primary {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+  .admin-btn-primary:hover {
+    background: color-mix(in srgb, var(--ink) 85%, var(--second));
+  }
+  .admin-btn-quiet {
+    border-color: transparent;
+    background: transparent;
+    color: var(--muted);
+  }
+  .admin-btn-quiet:hover {
+    color: var(--ink);
+    border-color: var(--line);
+  }
+}

@@ -1,6 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-
-const PORT = 3100;
+import { E2E_PORT as PORT } from "./e2e/fixtures";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -18,9 +17,10 @@ export default defineConfig({
     { name: "mobile", use: { ...devices["Pixel 7"] } },
   ],
   webServer: {
-    command: `npm run start -- -p ${PORT}`,
+    // Base jetable + compte admin de test (voir scripts/e2e-server.ts). Lancer `npm run build` avant.
+    command: "npx tsx scripts/e2e-server.ts",
     url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });

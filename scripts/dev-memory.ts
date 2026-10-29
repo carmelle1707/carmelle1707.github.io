@@ -3,6 +3,7 @@
  * Les données sont gardées dans .data/mongo entre deux lancements.
  */
 import { spawn } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { MongoMemoryServer } from "mongodb-memory-server";
@@ -36,6 +37,15 @@ async function main() {
   const admin = adminSeedSchema.safeParse(process.env);
   if (admin.success) await upsertAdmin(admin.data.ADMIN_EMAIL, admin.data.ADMIN_PASSWORD);
   await mongoose.disconnect();
+
+  // Sans AUTH_SECRET, un secret temporaire suffit en local (les sessions sautent au redémarrage)
+  if (!process.env.AUTH_SECRET) {
+    process.env.AUTH_SECRET = randomBytes(32).toString("base64");
+    console.warn("! AUTH_SECRET absent de .env.local : secret temporaire utilisé.");
+  }
+  if (!admin.success) {
+    console.warn("! ADMIN_EMAIL / ADMIN_PASSWORD absents : aucun compte admin pour se connecter.");
+  }
 
   const next = spawn("npx", ["next", "dev", ...process.argv.slice(2)], {
     stdio: "inherit",
