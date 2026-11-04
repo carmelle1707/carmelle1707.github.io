@@ -17,6 +17,7 @@ export default async function DashboardPage() {
     {
       label: "Projets",
       value: `${plural(d.published, "publié", "publiés")}, ${plural(d.drafts, "brouillon", "brouillons")}`,
+      href: "/admin/projets",
     },
     {
       label: "Services",

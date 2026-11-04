@@ -30,13 +30,18 @@ import {
 import { CollectionEditor } from "./collection-editor";
 import { ConfirmButton } from "./confirm-button";
 
-type Props = { collection: EditableCollection; items: CollectionItem[] };
+type Props = {
+  collection: EditableCollection;
+  items: CollectionItem[];
+  /** false sans BLOB_READ_WRITE_TOKEN : les champs image restent consultables */
+  uploadsEnabled: boolean;
+};
 
 /**
  * Liste d'une collection : ajout, modification en place, suppression confirmée et
  * réordonnancement par glisser-déposer (souris, doigt ou clavier : Espace puis flèches).
  */
-export function CollectionManager({ collection, items: initial }: Props) {
+export function CollectionManager({ collection, items: initial, uploadsEnabled }: Props) {
   const def = COLLECTIONS[collection];
   // Les données du serveur font foi : on ne garde un ordre local que pendant un déplacement
   const [items, setItems] = useState(initial);
@@ -121,7 +126,12 @@ export function CollectionManager({ collection, items: initial }: Props) {
           className="overflow-hidden rounded-[14px] border border-line"
         >
           <p className="bg-surface px-5 py-3 font-semibold">Nouvel élément</p>
-          <CollectionEditor collection={collection} item={null} onDone={close} />
+          <CollectionEditor
+            collection={collection}
+            item={null}
+            uploadsEnabled={uploadsEnabled}
+            onDone={close}
+          />
         </section>
       )}
 
@@ -151,6 +161,7 @@ export function CollectionManager({ collection, items: initial }: Props) {
                   collection={collection}
                   editing={editing === item.id}
                   onEdit={() => setEditing(editing === item.id ? null : item.id)}
+                  uploadsEnabled={uploadsEnabled}
                   onClose={close}
                   onDelete={() => remove(item)}
                 />
@@ -167,6 +178,7 @@ function SortableRow({
   item,
   collection,
   editing,
+  uploadsEnabled,
   onEdit,
   onClose,
   onDelete,
@@ -174,6 +186,7 @@ function SortableRow({
   item: CollectionItem;
   collection: EditableCollection;
   editing: boolean;
+  uploadsEnabled: boolean;
   onEdit: () => void;
   onClose: () => void;
   onDelete: () => Promise<void>;
@@ -236,7 +249,14 @@ function SortableRow({
           />
         </div>
       </div>
-      {editing && <CollectionEditor collection={collection} item={item} onDone={onClose} />}
+      {editing && (
+        <CollectionEditor
+          collection={collection}
+          item={item}
+          uploadsEnabled={uploadsEnabled}
+          onDone={onClose}
+        />
+      )}
     </li>
   );
 }

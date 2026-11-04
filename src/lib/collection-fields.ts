@@ -2,21 +2,29 @@ import { SERVICE_ICONS, SERVICE_ICON_LABELS } from "@/schemas/constants";
 
 /**
  * Description des listes modifiables de l'admin, partagée par le serveur (lecture du formulaire)
- * et le client (affichage des champs). Les projets ont leur propre écran (étape 10).
+ * et le client (affichage des champs).
  */
 
 export type FieldDef = {
   name: string;
   label: string;
-  /** lines = une valeur par ligne, enregistrée en tableau */
-  kind: "text" | "textarea" | "lines" | "select";
+  /**
+   * lines = une valeur par ligne, enregistrée en tableau ;
+   * media = fichier envoyé vers Vercel Blob ; switch = interrupteur oui / non
+   */
+  kind: "text" | "url" | "textarea" | "lines" | "select" | "media" | "switch";
   required?: boolean;
   hint?: string;
   maxLength?: number;
   options?: readonly { value: string; label: string }[];
+  placeholder?: string;
+  /** media : dossier de rangement dans le Blob */
+  folder?: string;
 };
 
-export type CollectionItem = { id: string } & Record<string, string | string[]>;
+export type MediaValue = { url: string; pathname: string } | null;
+export type FieldValue = string | string[] | boolean | MediaValue;
+export type CollectionItem = { id: string } & Record<string, FieldValue>;
 
 type CollectionDef = {
   title: string;
@@ -28,13 +36,61 @@ type CollectionDef = {
   summary: (item: CollectionItem) => { title: string; detail?: string };
 };
 
-const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v.join(", ") : (v ?? ""));
-const count = (v: string | string[] | undefined, one: string, many: string) => {
+const str = (v: FieldValue | undefined) =>
+  Array.isArray(v) ? v.join(", ") : typeof v === "string" ? v : "";
+const count = (v: FieldValue | undefined, one: string, many: string) => {
   const n = Array.isArray(v) ? v.length : 0;
   return `${n} ${n > 1 ? many : one}`;
 };
 
 export const COLLECTIONS = {
+  projects: {
+    title: "Projets",
+    intro: "Les réalisations. Seuls les projets publiés apparaissent sur le site.",
+    one: "un projet",
+    path: "/admin/projets",
+    fields: [
+      {
+        name: "published",
+        label: "Publié sur le site",
+        kind: "switch",
+        hint: "Décoché, le projet reste un brouillon visible seulement ici.",
+      },
+      { name: "title", label: "Nom du projet", kind: "text", required: true, maxLength: 100 },
+      {
+        name: "tag",
+        label: "Catégorie affichée",
+        kind: "text",
+        maxLength: 120,
+        placeholder: "Application web · Productivité",
+      },
+      { name: "desc", label: "Description", kind: "textarea", required: true, maxLength: 600 },
+      { name: "role", label: "Mon rôle", kind: "textarea", maxLength: 400 },
+      {
+        name: "stack",
+        label: "Technologies",
+        kind: "lines",
+        hint: "Une technologie par ligne (15 maximum), affichées en étiquettes.",
+      },
+      { name: "image", label: "Capture d'écran", kind: "media", folder: "projets" },
+      {
+        name: "demoUrl",
+        label: "Lien de démo",
+        kind: "url",
+        placeholder: "https://…",
+      },
+      {
+        name: "githubUrl",
+        label: "Lien GitHub",
+        kind: "url",
+        placeholder: "https://github.com/…",
+      },
+    ],
+    summary: (i) => ({
+      title: str(i.title),
+      detail: [i.published ? "Publié" : "Brouillon", str(i.tag)].filter(Boolean).join(" · "),
+    }),
+  },
   services: {
     title: "Services",
     intro: "Les offres présentées en cartes, dans l'ordre affiché sur le site.",
@@ -134,8 +190,13 @@ export const EDITABLE_COLLECTIONS = Object.keys(COLLECTIONS) as EditableCollecti
 export const summaryOf = (key: EditableCollection, item: CollectionItem) =>
   (COLLECTIONS[key] as CollectionDef).summary(item);
 
-/** Valeur brute d'un champ à partir du formulaire (les listes : une ligne = une valeur). */
-export function readField(field: FieldDef, formData: FormData): string | string[] {
+/** Valeur brute d'un champ à partir du formulaire, avant validation par le schéma Zod. */
+export function readField(field: FieldDef, formData: FormData): FieldValue {
+  if (field.kind === "switch") return formData.get(field.name) === "on";
+  if (field.kind === "media") {
+    const url = String(formData.get(`${field.name}.url`) ?? "").trim();
+    return url ? { url, pathname: String(formData.get(`${field.name}.pathname`) ?? "") } : null;
+  }
   const raw = String(formData.get(field.name) ?? "");
   return field.kind === "lines" ? raw.split(/\r?\n/).map((l) => l.trim()) : raw;
 }

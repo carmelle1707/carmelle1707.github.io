@@ -12,7 +12,11 @@ export async function CollectionPage({ collection }: { collection: EditableColle
         <h1 className="text-[32px] font-extrabold">{def.title}</h1>
         <p className="mt-1 text-muted">{def.intro}</p>
       </div>
-      <CollectionManager collection={collection} items={items} />
+      <CollectionManager
+        collection={collection}
+        items={items}
+        uploadsEnabled={Boolean(process.env.BLOB_READ_WRITE_TOKEN)}
+      />
     </div>
   );
 }

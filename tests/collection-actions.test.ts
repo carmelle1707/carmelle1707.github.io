@@ -136,3 +136,57 @@ describe("deleteCollectionItem", () => {
     expect(mocks.del).toHaveBeenCalledWith(url);
   });
 });
+
+describe("projets", () => {
+  const project = {
+    title: "Flot",
+    desc: "Application de suivi de trésorerie.",
+    stack: "Next.js\nMongoDB\n",
+    demoUrl: "",
+    githubUrl: "https://github.com/carmelle1707/flot",
+  };
+  const BLOB = "https://abc.public.blob.vercel-storage.com/projets";
+
+  it("crée un brouillon quand l'interrupteur « Publié » est décoché", async () => {
+    const res = await saveCollectionItem("projects", null, idleState, form(project));
+    expect(res.status).toBe("success");
+    expect(await Project.findOne().lean()).toMatchObject({
+      published: false,
+      stack: ["Next.js", "MongoDB"],
+      image: null,
+    });
+  });
+
+  it("publie, refuse un lien invalide et remplace la capture en supprimant l'ancienne", async () => {
+    const bad = await saveCollectionItem(
+      "projects",
+      null,
+      idleState,
+      form({ ...project, demoUrl: "flot.ci" }),
+    );
+    expect(bad.status).toBe("error");
+    if (bad.status === "error") expect(bad.fieldErrors.demoUrl).toMatch(/https:\/\//);
+
+    const p = await Project.create({
+      ...project,
+      stack: [],
+      image: { url: `${BLOB}/ancienne.png`, pathname: "projets/ancienne.png" },
+      order: 0,
+    });
+    const res = await saveCollectionItem(
+      "projects",
+      String(p._id),
+      idleState,
+      form({
+        ...project,
+        published: "on",
+        "image.url": `${BLOB}/nouvelle.png`,
+        "image.pathname": "projets/nouvelle.png",
+      }),
+    );
+    expect(res.status).toBe("success");
+    const saved = await Project.findById(p._id).lean();
+    expect(saved).toMatchObject({ published: true, image: { pathname: "projets/nouvelle.png" } });
+    expect(mocks.del).toHaveBeenCalledWith(`${BLOB}/ancienne.png`);
+  });
+});

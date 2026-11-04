@@ -1,18 +1,25 @@
 import "server-only";
 import type { Model } from "mongoose";
 import { connection } from "next/server";
-import { type CollectionItem, COLLECTIONS, type EditableCollection } from "@/lib/collection-fields";
+import {
+  type CollectionItem,
+  COLLECTIONS,
+  type EditableCollection,
+  type FieldDef,
+} from "@/lib/collection-fields";
 import { connectDb } from "@/lib/db";
 import { type OrderedCollection, orderedModels } from "@/models";
 import {
   educationSchema,
   marqueeWordSchema,
+  projectSchema,
   serviceSchema,
   skillGroupSchema,
   stepSchema,
 } from "@/schemas/content";
 
 export const COLLECTION_SCHEMAS = {
+  projects: projectSchema,
   services: serviceSchema,
   steps: stepSchema,
   skills: skillGroupSchema,
@@ -27,9 +34,13 @@ export const modelOf = (key: OrderedCollection) => orderedModels[key] as unknown
 
 function toItem(key: EditableCollection, doc: Record<string, unknown>): CollectionItem {
   const item: CollectionItem = { id: String(doc._id) };
-  for (const f of COLLECTIONS[key].fields) {
+  for (const f of COLLECTIONS[key].fields as readonly FieldDef[]) {
     const v = doc[f.name];
-    item[f.name] = Array.isArray(v) ? v.map(String) : String(v ?? "");
+    if (f.kind === "switch") item[f.name] = Boolean(v);
+    else if (f.kind === "media") {
+      const m = v as { url?: string; pathname?: string } | null | undefined;
+      item[f.name] = m?.url ? { url: m.url, pathname: m.pathname ?? "" } : null;
+    } else item[f.name] = Array.isArray(v) ? v.map(String) : String(v ?? "");
   }
   return item;
 }
