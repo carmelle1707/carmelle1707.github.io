@@ -1,5 +1,6 @@
 import "server-only";
 import bcrypt from "bcryptjs";
+import { ensureBootstrap } from "@/lib/bootstrap";
 import { connectDb } from "@/lib/db";
 import { consumeRateLimit, hashIp } from "@/lib/rate-limit";
 import { AdminUser } from "@/models";
@@ -20,6 +21,8 @@ export type LoginResult =
 
 export async function verifyAdminCredentials(raw: unknown, ip: string): Promise<LoginResult> {
   await connectDb();
+  // Base neuve : le compte admin est créé ici au premier essai de connexion
+  await ensureBootstrap();
   if (!(await consumeRateLimit(`login:${hashIp(ip)}`, LOGIN_LIMIT, LOGIN_WINDOW_MS))) {
     return { ok: false, reason: "rate-limited" };
   }

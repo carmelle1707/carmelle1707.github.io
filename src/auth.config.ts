@@ -1,4 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
+import { serverSecret } from "@/lib/secrets";
 
 export const LOGIN_PATH = "/admin/connexion";
 
@@ -11,6 +12,7 @@ export const authConfig = {
   session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60 },
   // Le site est derrière Vercel (ou en local) : l'en-tête Host est fiable
   trustHost: true,
+  secret: serverSecret("AUTH_SECRET"),
   providers: [],
   callbacks: {
     authorized({ auth, request }) {

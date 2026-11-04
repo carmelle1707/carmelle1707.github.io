@@ -12,6 +12,7 @@ import {
   Step,
 } from "@/models";
 import { contentFileSchema } from "@/schemas/content-file";
+import { ensureBootstrap } from "./bootstrap";
 import { siteContentFromFile } from "./content-from-file";
 import type { SiteContent } from "./content-types";
 import { connectDb } from "./db";
@@ -35,6 +36,7 @@ export async function getSiteContent(): Promise<SiteContent> {
 
   if (!process.env.MONGODB_URI) return fallback();
   await connectDb();
+  await ensureBootstrap();
 
   const sort = { order: 1 } as const;
   const [profile, contact, marquee, services, steps, projects, skills, education] =

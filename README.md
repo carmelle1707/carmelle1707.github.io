@@ -84,18 +84,18 @@ est ignoré par git et ne doit jamais être partagé ni commité.
 
 Chaque variable est aussi expliquée dans `.env.example`.
 
-| Variable                | Obligatoire        | Où la trouver                                                                                                                 |
-| ----------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`  | en production      | L'adresse publique du site, sans `/` final (ex. `https://ange-carmelle.vercel.app`). Sert aux liens de partage et au sitemap. |
-| `MONGODB_URI`           | oui                | MongoDB Atlas › Database › Connect › Drivers. Ajoute le nom de la base après le `/` : `…mongodb.net/portfolio?…`              |
-| `AUTH_SECRET`           | oui                | Une chaîne aléatoire : `npx auth secret` ou `openssl rand -base64 32`                                                         |
-| `ADMIN_EMAIL`           | oui (pour le seed) | L'email de connexion à l'admin                                                                                                |
-| `ADMIN_PASSWORD`        | oui (pour le seed) | 12 caractères minimum. Il est hashé avant d'être enregistré, jamais stocké en clair.                                          |
-| `BLOB_READ_WRITE_TOKEN` | pour les fichiers  | Vercel › Storage › Create › Blob, puis l'onglet `.env.local` du store                                                         |
-| `RESEND_API_KEY`        | pour les emails    | resend.com › API Keys › Create API Key (permission « Sending access »)                                                        |
-| `CONTACT_FROM_EMAIL`    | non                | Expéditeur des emails. `onboarding@resend.dev` tant qu'aucun domaine n'est vérifié sur Resend.                                |
-| `CONTACT_TO_EMAIL`      | pour les emails    | L'adresse qui reçoit les messages du formulaire                                                                               |
-| `RATE_LIMIT_SALT`       | recommandé         | N'importe quelle chaîne aléatoire : sert à brouiller les adresses IP avant de les enregistrer                                 |
+| Variable                | Obligatoire       | Où la trouver                                                                                                                            |
+| ----------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`  | en production     | L'adresse publique du site, sans `/` final (ex. `https://ange-carmelle.vercel.app`). Sert aux liens de partage et au sitemap.            |
+| `MONGODB_URI`           | oui               | MongoDB Atlas › Database › Connect › Drivers. Ajoute le nom de la base après le `/` : `…mongodb.net/portfolio?…`                         |
+| `AUTH_SECRET`           | non               | Facultatif : sans valeur, une clé est dérivée de `MONGODB_URI`. Sinon, une chaîne aléatoire (`npx auth secret`).                         |
+| `ADMIN_EMAIL`           | oui               | L'email de connexion à l'admin                                                                                                           |
+| `ADMIN_PASSWORD`        | oui               | 12 caractères minimum. Hashé avant d'être enregistré, jamais stocké en clair. Le compte est créé au premier démarrage sur une base vide. |
+| `BLOB_READ_WRITE_TOKEN` | pour les fichiers | Vercel › Storage › Create › Blob, puis l'onglet `.env.local` du store                                                                    |
+| `RESEND_API_KEY`        | pour les emails   | resend.com › API Keys › Create API Key (permission « Sending access »)                                                                   |
+| `CONTACT_FROM_EMAIL`    | non               | Expéditeur des emails. `onboarding@resend.dev` tant qu'aucun domaine n'est vérifié sur Resend.                                           |
+| `CONTACT_TO_EMAIL`      | pour les emails   | L'adresse qui reçoit les messages du formulaire                                                                                          |
+| `RATE_LIMIT_SALT`       | non               | Brouille les adresses IP avant de les enregistrer. Sans valeur, dérivé de `MONGODB_URI`.                                                 |
 
 Sans `RESEND_API_KEY`, les messages du formulaire sont tout de même enregistrés et visibles
 dans l'admin. Sans `BLOB_READ_WRITE_TOKEN`, l'admin affiche les fichiers existants mais
@@ -181,17 +181,23 @@ cd ~/Rendu/carmelle1707.github.io && source ~/.nvm/nvm.sh && sudo env "PATH=$PAT
 
 ## Déploiement sur Vercel
 
-1. Pousse le dépôt sur GitHub, puis sur vercel.com : **Add New › Project** et importe-le.
-   Vercel détecte Next.js tout seul.
-2. Dans **Settings › Environment Variables**, ajoute toutes les variables du tableau
-   ci-dessus (Production et Preview). `NEXT_PUBLIC_SITE_URL` doit contenir l'adresse finale.
-3. Dans **Storage**, crée un store Blob et relie-le au projet : `BLOB_READ_WRITE_TOKEN` est
-   ajouté automatiquement.
-4. Dans MongoDB Atlas › Network Access, autorise les connexions depuis Vercel
-   (`0.0.0.0/0`, l'accès restant protégé par le mot de passe de la base).
-5. Lance le seed une fois sur la base de production, depuis ta machine, avec le
-   `MONGODB_URI` de production dans `.env.local` : `npm run seed`.
-6. Déploie. Chaque push sur la branche de production redéploie le site.
+Le site se prépare tout seul au premier démarrage : sur une base vide, il importe
+`data/content.json` et crée le compte admin depuis `ADMIN_EMAIL` et `ADMIN_PASSWORD`. Pas besoin
+de lancer `npm run seed` en production.
+
+1. Sur vercel.com : **Add New › Project**, importe le dépôt GitHub. Vercel détecte Next.js.
+2. **Settings › Git › Production Branch** : la branche à mettre en ligne (`nextjs`).
+3. **Storage › Create Database › MongoDB Atlas** : Vercel crée la base et ajoute
+   `MONGODB_URI` au projet.
+4. **Storage › Create › Blob** : `BLOB_READ_WRITE_TOKEN` est ajouté automatiquement.
+5. **Settings › Environment Variables** : `ADMIN_EMAIL`, `ADMIN_PASSWORD`,
+   `NEXT_PUBLIC_SITE_URL` (l'adresse finale), puis `RESEND_API_KEY`, `CONTACT_TO_EMAIL` et
+   `CONTACT_FROM_EMAIL` pour les emails.
+6. **Settings › Functions › Function Region** : Paris (`cdg1`), au plus près d'Abidjan.
+7. **Deployments › Redeploy**. Chaque push sur la branche de production redéploie ensuite le site.
+
+Pour changer plus tard le mot de passe admin : mets à jour `ADMIN_PASSWORD` dans `.env.local`
+avec le `MONGODB_URI` de production, puis lance `npm run seed` depuis ta machine.
 
 ## Sécurité
 
@@ -201,5 +207,5 @@ cd ~/Rendu/carmelle1707.github.io && source ~/.nvm/nvm.sh && sudo env "PATH=$PAT
 - Connexion limitée à 10 tentatives par quart d'heure et par IP ; formulaire de contact
   limité à 5 messages par heure, avec un champ piège contre les robots.
 - Tout ce qui arrive du navigateur est revalidé avec Zod côté serveur.
-- Les adresses IP ne sont jamais stockées en clair (hash salé avec `RATE_LIMIT_SALT`).
+- Les adresses IP ne sont jamais stockées en clair (hash salé).
 - L'admin n'est pas indexé par les moteurs de recherche (`robots.txt` et balise `noindex`).

@@ -1,10 +1,11 @@
 import "server-only";
 import { createHash } from "node:crypto";
+import { serverSecret } from "@/lib/secrets";
 import { RateLimit } from "@/models";
 
 /** Hash d'une IP : on ne stocke jamais l'adresse en clair. */
 export function hashIp(ip: string): string {
-  const salt = process.env.RATE_LIMIT_SALT ?? "";
+  const salt = serverSecret("RATE_LIMIT_SALT") ?? "";
   return createHash("sha256").update(`${salt}:${ip}`).digest("hex");
 }
 
