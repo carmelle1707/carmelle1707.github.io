@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 export const ADMIN_NAV = [
   { href: "/admin", label: "Tableau de bord" },
+  { href: "/admin/messages", label: "Messages" },
   { href: "/admin/profil", label: "Profil" },
   { href: "/admin/projets", label: "Projets" },
   { href: "/admin/services", label: "Services" },
@@ -15,7 +16,7 @@ export const ADMIN_NAV = [
   { href: "/admin/contact", label: "Contact" },
 ] as const;
 
-export function AdminNav() {
+export function AdminNav({ unread }: { unread: number }) {
   const pathname = usePathname();
   return (
     <nav aria-label="Sections de l'administration" className="border-b border-line bg-surface">
@@ -29,6 +30,12 @@ export function AdminNav() {
               aria-current={pathname === item.href ? "page" : undefined}
             >
               {item.label}
+              {item.href === "/admin/messages" && unread > 0 && (
+                <span className="ml-1.5 inline-grid min-w-5 place-items-center rounded-full bg-second px-1.5 text-xs font-bold text-white">
+                  {unread}
+                  <span className="sr-only"> non lus</span>
+                </span>
+              )}
             </Link>
           </li>
         ))}

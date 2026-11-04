@@ -2,7 +2,9 @@ import Link from "next/link";
 import { logout } from "@/actions/auth";
 import { AdminNav } from "./admin-nav";
 
-export function AdminShell({ email, children }: { email: string; children: React.ReactNode }) {
+type Props = { email: string; unread: number; children: React.ReactNode };
+
+export function AdminShell({ email, unread, children }: Props) {
   return (
     <>
       <header className="sticky top-0 z-10 border-b border-line bg-surface">
@@ -23,7 +25,7 @@ export function AdminShell({ email, children }: { email: string; children: React
           </div>
         </div>
       </header>
-      <AdminNav />
+      <AdminNav unread={unread} />
       <main className="mx-auto max-w-[1120px] px-5 py-10">{children}</main>
     </>
   );

@@ -60,6 +60,41 @@ export async function getAdminContact(): Promise<SiteContent["contact"]> {
   };
 }
 
+export type InboxMessage = {
+  id: string;
+  name: string;
+  email: string;
+  projectType: string;
+  budget: string;
+  message: string;
+  read: boolean;
+  archived: boolean;
+  createdAt: string;
+};
+
+/** Messages du formulaire, du plus récent au plus ancien. */
+export async function getInbox(archived: boolean): Promise<InboxMessage[]> {
+  await fresh();
+  const docs = await Message.find({ archived }).sort({ createdAt: -1 }).limit(300).lean();
+  return docs.map((m) => ({
+    id: String(m._id),
+    name: m.name,
+    email: m.email,
+    projectType: m.projectType,
+    budget: m.budget ?? "",
+    message: m.message,
+    read: m.read,
+    archived: m.archived,
+    // Champ ajouté par l'option timestamps (absent du type déduit du schéma)
+    createdAt: new Date((m as unknown as { createdAt: Date }).createdAt).toISOString(),
+  }));
+}
+
+export async function countUnread(): Promise<number> {
+  await fresh();
+  return Message.countDocuments({ read: false, archived: false });
+}
+
 export async function getDashboard() {
   await fresh();
   const [profile, unread, messages, published, drafts, services, steps, skills, education, words] =

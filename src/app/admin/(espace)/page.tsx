@@ -64,6 +64,9 @@ export default async function DashboardPage() {
         <p className="text-sm text-muted">
           {plural(d.messages, "message reçu", "messages reçus")} au total (hors archives).
         </p>
+        <Link href="/admin/messages" className="admin-btn mt-4">
+          Ouvrir la boîte de réception
+        </Link>
       </section>
 
       <section
