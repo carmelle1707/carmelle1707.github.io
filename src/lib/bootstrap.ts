@@ -1,4 +1,5 @@
 import "server-only";
+import bcrypt from "bcryptjs";
 import contentJson from "../../data/content.json";
 import { contentFromFile } from "@/lib/content-from-file";
 import { connectDb } from "@/lib/db";
@@ -35,11 +36,17 @@ async function run() {
     }
   }
 
-  if (!(await AdminUser.exists({}))) {
-    const admin = adminSeedSchema.safeParse(process.env);
-    if (admin.success) {
-      await upsertAdmin(admin.data.ADMIN_EMAIL, admin.data.ADMIN_PASSWORD);
-      console.log("[premier démarrage] compte admin créé");
+  // ADMIN_EMAIL / ADMIN_PASSWORD (variables Vercel) font foi : les changer puis redéployer
+  // met le compte à jour. Sans ces variables, le compte existant n'est pas touché.
+  const admin = adminSeedSchema.safeParse(process.env);
+  if (admin.success) {
+    const { ADMIN_EMAIL: email, ADMIN_PASSWORD: password } = admin.data;
+    const current = await AdminUser.findOne().lean();
+    const upToDate =
+      current?.email === email && (await bcrypt.compare(password, current.passwordHash));
+    if (!upToDate) {
+      const result = await upsertAdmin(email, password);
+      console.log(`[démarrage] compte admin ${result === "created" ? "créé" : "mis à jour"}`);
     }
   }
 }

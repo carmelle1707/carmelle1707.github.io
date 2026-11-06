@@ -43,7 +43,7 @@ describe("premier démarrage", () => {
     expect(await Service.countDocuments()).toBe(3);
   });
 
-  it("ne touche ni au contenu ni au compte existants", async () => {
+  it("ne réimporte pas le contenu existant", async () => {
     await Profile.create({
       key: "main",
       name: "X",
@@ -52,20 +52,39 @@ describe("premier démarrage", () => {
       headline: "H",
       lead: "L",
     });
-    await AdminUser.create({ email: "deja@exemple.ci", passwordHash: "hash" });
-    vi.stubEnv("ADMIN_EMAIL", "autre@exemple.ci");
-    vi.stubEnv("ADMIN_PASSWORD", "un-mot-de-passe-solide");
     await ensureBootstrap();
-
     expect(await Service.countDocuments()).toBe(0);
-    expect((await AdminUser.find().lean()).map((a) => a.email)).toEqual(["deja@exemple.ci"]);
   });
 
-  it("sans ADMIN_EMAIL / ADMIN_PASSWORD, n'invente pas de compte", async () => {
+  it("aligne le compte admin sur ADMIN_EMAIL / ADMIN_PASSWORD (changement de mot de passe)", async () => {
+    vi.stubEnv("ADMIN_EMAIL", "moi@exemple.ci");
+    vi.stubEnv("ADMIN_PASSWORD", "ancien-mot-de-passe");
+    await ensureBootstrap();
+    const before = await AdminUser.findOne().lean();
+
+    reset();
+    vi.stubEnv("ADMIN_PASSWORD", "nouveau-mot-de-passe");
+    await ensureBootstrap();
+    const after = await AdminUser.find().lean();
+    expect(after).toHaveLength(1);
+    expect(await bcrypt.compare("nouveau-mot-de-passe", after[0].passwordHash)).toBe(true);
+    expect(await bcrypt.compare("ancien-mot-de-passe", after[0].passwordHash)).toBe(false);
+
+    // Identifiants inchangés : le hash n'est pas recalculé à chaque démarrage
+    reset();
+    await ensureBootstrap();
+    expect((await AdminUser.findOne().lean())?.passwordHash).toBe(after[0].passwordHash);
+    expect(before?.passwordHash).not.toBe(after[0].passwordHash);
+  });
+
+  it("sans ADMIN_EMAIL / ADMIN_PASSWORD, ne crée ni ne modifie aucun compte", async () => {
+    await AdminUser.create({ email: "deja@exemple.ci", passwordHash: "hash" });
     vi.stubEnv("ADMIN_EMAIL", "");
     vi.stubEnv("ADMIN_PASSWORD", "");
     await ensureBootstrap();
-    expect(await AdminUser.countDocuments()).toBe(0);
+    expect(await AdminUser.find().lean()).toMatchObject([
+      { email: "deja@exemple.ci", passwordHash: "hash" },
+    ]);
   });
 });
 
