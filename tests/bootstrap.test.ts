@@ -86,6 +86,26 @@ describe("premier démarrage", () => {
       { email: "deja@exemple.ci", passwordHash: "hash" },
     ]);
   });
+
+  it("ignore un espace ou un retour à la ligne collé autour du mot de passe", async () => {
+    vi.stubEnv("ADMIN_EMAIL", "moi@exemple.ci");
+    vi.stubEnv("ADMIN_PASSWORD", "  mot-de-passe-colle\n");
+    await ensureBootstrap();
+    const admin = await AdminUser.findOne().lean();
+    expect(await bcrypt.compare("mot-de-passe-colle", admin?.passwordHash ?? "")).toBe(true);
+  });
+
+  it("explique dans les journaux pourquoi un mot de passe trop court est ignoré", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubEnv("ADMIN_EMAIL", "moi@exemple.ci");
+    vi.stubEnv("ADMIN_PASSWORD", "court");
+    await ensureBootstrap();
+    expect(await AdminUser.countDocuments()).toBe(0);
+    const message = String(warn.mock.calls[0]?.[0]);
+    expect(message).toContain("au moins 12 caractères");
+    expect(message).not.toContain("court");
+    warn.mockRestore();
+  });
 });
 
 describe("serverSecret", () => {

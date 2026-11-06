@@ -38,17 +38,25 @@ async function run() {
 
   // ADMIN_EMAIL / ADMIN_PASSWORD (variables Vercel) font foi : les changer puis redéployer
   // met le compte à jour. Sans ces variables, le compte existant n'est pas touché.
+  // Les journaux disent ce qui s'est passé, sans jamais afficher l'email ni le mot de passe.
   const admin = adminSeedSchema.safeParse(process.env);
-  if (admin.success) {
-    const { ADMIN_EMAIL: email, ADMIN_PASSWORD: password } = admin.data;
-    const current = await AdminUser.findOne().lean();
-    const upToDate =
-      current?.email === email && (await bcrypt.compare(password, current.passwordHash));
-    if (!upToDate) {
-      const result = await upsertAdmin(email, password);
-      console.log(`[démarrage] compte admin ${result === "created" ? "créé" : "mis à jour"}`);
+  if (!admin.success) {
+    if (process.env.ADMIN_EMAIL || process.env.ADMIN_PASSWORD) {
+      const reasons = admin.error.issues.map((i) => i.message).join(" ");
+      console.warn(`[démarrage] compte admin non modifié : ${reasons}`);
     }
+    return;
   }
+  const { ADMIN_EMAIL: email, ADMIN_PASSWORD: password } = admin.data;
+  const current = await AdminUser.findOne().lean();
+  const upToDate =
+    current?.email === email && (await bcrypt.compare(password, current.passwordHash));
+  if (upToDate) {
+    console.log("[démarrage] compte admin déjà à jour");
+    return;
+  }
+  const result = await upsertAdmin(email, password);
+  console.log(`[démarrage] compte admin ${result === "created" ? "créé" : "mis à jour"}`);
 }
 
 const globalForBootstrap = globalThis as typeof globalThis & { __bootstrap?: Promise<void> };
