@@ -1,5 +1,6 @@
 import type { SiteContent } from "@/lib/content-types";
 import { stripEmphasis } from "@/lib/rich-title";
+import { PRESENTATION_VIDEO } from "@/lib/video";
 
 /**
  * Données structurées schema.org (JSON-LD) : la personne et son activité de prestataire.
@@ -19,6 +20,8 @@ export function structuredData(c: SiteContent, url: string) {
         "@type": "Person",
         "@id": personId,
         name: c.profile.name,
+        // Variantes sous lesquelles on peut la chercher (« Ange Carmelle », « Carmelle Gbedji »…)
+        alternateName: nameVariants(c.profile.name, c.profile.shortName),
         jobTitle: c.profile.role,
         description: c.profile.lead,
         url,
@@ -50,8 +53,43 @@ export function structuredData(c: SiteContent, url: string) {
         },
         sameAs,
       },
+      videoData(c, url, personId),
     ],
   };
+}
+
+/** Vidéo de présentation (accueil) : peut apparaître dans l'onglet Vidéos et les résultats Google. */
+function videoData(c: SiteContent, url: string, personId: string) {
+  const abs = (path: string) => new URL(path, `${url}/`).toString();
+  return {
+    "@type": "VideoObject",
+    "@id": `${url}/#video`,
+    name: PRESENTATION_VIDEO.title,
+    description: PRESENTATION_VIDEO.description,
+    thumbnailUrl: [abs(PRESENTATION_VIDEO.square.poster), abs(PRESENTATION_VIDEO.vertical.poster)],
+    uploadDate: PRESENTATION_VIDEO.uploadDate,
+    duration: `PT${PRESENTATION_VIDEO.durationSeconds}S`,
+    contentUrl: abs(PRESENTATION_VIDEO.square.src),
+    embedUrl: `${url}/#video`,
+    inLanguage: "en",
+    creator: { "@id": personId },
+    about: { "@id": personId },
+    publisher: { "@id": personId, "@type": "Person", name: c.profile.name },
+  };
+}
+
+/** « Ange Carmelle Gbedji » → [« Ange Carmelle », « Carmelle Gbedji », « Ange Gbedji »]. */
+export function nameVariants(name: string, shortName?: string): string[] {
+  const parts = name.trim().split(/\s+/);
+  const variants = new Set<string>();
+  if (shortName && shortName !== name) variants.add(shortName);
+  if (parts.length >= 3) {
+    variants.add(parts.slice(0, -1).join(" "));
+    variants.add(parts.slice(1).join(" "));
+    variants.add(`${parts[0]} ${parts[parts.length - 1]}`);
+  }
+  variants.delete(name);
+  return [...variants];
 }
 
 type Crumb = { name: string; path: string };

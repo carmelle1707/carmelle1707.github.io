@@ -6,6 +6,7 @@ import { siteUrl } from "@/lib/site-url";
 import { slugify, withSlugs } from "@/lib/slug";
 import {
   jsonLdString,
+  nameVariants,
   projectPageData,
   servicePageData,
   structuredData,
@@ -16,6 +17,13 @@ vi.mock("@/lib/content", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/content")>();
   return { ...actual, getSiteContent: async () => actual.starterContent() };
 });
+
+/** Nœuds du JSON-LD de l'accueil, typés simplement pour les assertions. */
+const homeGraph = () =>
+  structuredData(starterContent(), "https://ange-carmelle.dev")["@graph"] as Record<
+    string,
+    unknown
+  >[];
 
 const URL_ENV = process.env.NEXT_PUBLIC_SITE_URL;
 afterEach(() => {
@@ -47,16 +55,19 @@ describe("SEO", () => {
   });
 
   it("JSON-LD : Person et ProfessionalService reliés, URLs absolues, services listés", () => {
-    const data = structuredData(starterContent(), "https://ange-carmelle.dev");
-    const [person, service] = data["@graph"];
-    expect(person["@type"]).toBe("Person");
-    expect(person.image).toBe("https://ange-carmelle.dev/images/photo-profil.jpeg");
-    expect(person.sameAs).toContain("https://github.com/carmelle1707");
-    expect(service["@type"]).toBe("ProfessionalService");
-    expect(service.founder).toEqual({ "@id": person["@id"] });
-    expect(service.description).not.toContain("*");
-    expect(service.hasOfferCatalog?.itemListElement.length).toBeGreaterThan(0);
-    expect(service.telephone).toMatch(/^\+225\d+$/);
+    const graph = homeGraph();
+    const person = graph.find((n) => n["@type"] === "Person");
+    const service = graph.find((n) => n["@type"] === "ProfessionalService");
+    expect(person).toMatchObject({
+      image: "https://ange-carmelle.dev/images/photo-profil.jpeg",
+      sameAs: expect.arrayContaining(["https://github.com/carmelle1707"]),
+    });
+    expect(service).toMatchObject({
+      founder: { "@id": person?.["@id"] },
+      telephone: expect.stringMatching(/^\+225\d+$/),
+      hasOfferCatalog: { itemListElement: expect.arrayContaining([expect.anything()]) },
+    });
+    expect(String(service?.description)).not.toContain("*");
   });
 
   it("JSON-LD des pages d'offre et de projet : reliés à la personne, avec fil d'Ariane", () => {
@@ -79,8 +90,47 @@ describe("SEO", () => {
     });
   });
 
+  it("JSON-LD de l'accueil : la vidéo de présentation et les variantes du nom", () => {
+    const graph = homeGraph();
+    const person = graph.find((n) => n["@type"] === "Person");
+    const video = graph.find((n) => n["@type"] === "VideoObject");
+    expect(person).toMatchObject({
+      alternateName: expect.arrayContaining(["Ange Carmelle", "Carmelle Gbedji"]),
+    });
+    expect(video).toMatchObject({
+      contentUrl: "https://ange-carmelle.dev/videos/presentation-carre.mp4",
+      duration: "PT60S",
+      uploadDate: "2026-11-04",
+      creator: { "@id": "https://ange-carmelle.dev/#personne" },
+      thumbnailUrl: expect.arrayContaining([
+        "https://ange-carmelle.dev/videos/presentation-carre.jpg",
+      ]),
+    });
+  });
+
+  it("le sitemap déclare la vidéo sur l'accueil", async () => {
+    process.env.NEXT_PUBLIC_SITE_URL = "https://ange-carmelle.dev";
+    const [home] = await sitemap();
+    expect(home.videos?.[0]).toMatchObject({
+      content_loc: "https://ange-carmelle.dev/videos/presentation-carre.mp4",
+      thumbnail_loc: "https://ange-carmelle.dev/videos/presentation-carre.jpg",
+      duration: 60,
+    });
+  });
+
   it("le JSON-LD ne peut pas fermer la balise <script>", () => {
     expect(jsonLdString({ t: "</script><script>alert(1)</script>" })).not.toContain("</script>");
+  });
+});
+
+describe("nameVariants", () => {
+  it("donne les combinaisons courtes du nom, sans le nom complet ni doublon", () => {
+    expect(nameVariants("Ange Carmelle Gbedji", "Ange Carmelle")).toEqual([
+      "Ange Carmelle",
+      "Carmelle Gbedji",
+      "Ange Gbedji",
+    ]);
+    expect(nameVariants("Awa Koné")).toEqual([]);
   });
 });
 
