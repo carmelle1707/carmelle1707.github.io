@@ -56,7 +56,7 @@ avec les réponses ci-dessous.
 Google te demandera ensuite de **valider** la fiche (code par SMS, appel, e-mail ou courte
 vidéo selon les cas). Sans validation, la fiche n'apparaît pas.
 
-### Description (à coller, 670 caractères)
+### Description (à coller, 645 caractères sur 750 autorisés)
 
 > Développeuse web et mobile freelance à Abidjan, je crée des sites vitrines, des
 > applications web et des applications mobiles pour les commerces, PME, startups et
