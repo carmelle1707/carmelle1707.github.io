@@ -6,7 +6,40 @@ une page par offre (`/services/site-vitrine`, `/services/application-web`,
 services, fil d'Ariane), image de partage, et l'ancien site `carmelle1707.github.io` qui
 redirige ici.
 
-Ce qui reste à faire de ton côté, avec ton compte Google : les deux parties ci-dessous.
+Ce qui reste à faire de ton côté, avec ton compte Google : les parties ci-dessous.
+
+---
+
+## 0. Être le premier résultat sur ton nom
+
+Ce qu'il faut savoir, honnêtement :
+
+- **Aucun réglage ne garantit la 1re place** : c'est Google qui classe. Mais sur un nom propre
+  peu courant comme « Ange Carmelle Gbedji », un site bien déclaré arrive en général en tête
+  en quelques jours à quelques semaines.
+- **Les suggestions pendant la frappe** (« Ange Carm… » → ton nom) ne se règlent pas : Google
+  les propose quand assez de gens tapent ton nom. Elles viendront avec le temps, en partageant
+  le site et la vidéo.
+
+Ce que le site fait déjà : ton nom ouvre le titre de chaque page, ta fiche « personne »
+(données structurées) relie le site à LinkedIn et GitHub et donne les variantes « Ange
+Carmelle », « Carmelle Gbedji », « Ange Gbedji » ; la vidéo est déclarée à Google
+(données vidéo + sitemap) avec une miniature qui montre ton nom et ta photo.
+
+Dans l'ordre, ce qui fait vraiment la différence :
+
+1. **Search Console** (partie 1) puis **Inspection de l'URL › Demander une indexation** sur
+   l'accueil. Sans ça, Google peut mettre des semaines à découvrir le site.
+2. **Les mêmes liens partout** : mets `https://ange-carmelle-gbedji.vercel.app/` dans ta bio
+   LinkedIn (section « Coordonnées » et « Sélection »), ton profil GitHub (champ Website),
+   WhatsApp Business, Instagram/TikTok. Ce sont les premiers profils que Google associe à ton nom.
+3. **La vidéo sur YouTube** : publie la version carrée (ou la verticale en Short) sur une chaîne
+   à ton nom, avec le titre `Ange Carmelle Gbedji · Développeuse web et mobile à Abidjan`
+   et l'adresse du site en première ligne de la description. YouTube est très souvent affiché
+   juste sous le site quand on cherche un nom.
+4. **La fiche Google Business** (partie 2), qui peut s'afficher à droite des résultats.
+5. **Un nom de domaine à toi** (par exemple `angecarmellegbedji.com`) : facultatif, mais un
+   domaine qui contient ton nom aide encore et inspire confiance.
 
 ---
 
