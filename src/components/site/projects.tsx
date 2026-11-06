@@ -1,5 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { withSlugs } from "@/lib/slug";
 import type { SiteContent } from "@/lib/content-types";
 import { SectionHead } from "./section-head";
 
@@ -15,7 +17,7 @@ export function Projects({ projects }: Pick<SiteContent, "projects">) {
           text="Une sélection de projets, du back-end au front, sur web et mobile."
         />
         <div className="grid gap-7" data-projects>
-          {projects.map((p, i) => (
+          {withSlugs(projects, (p) => p.title).map((p, i) => (
             <article
               key={p.id}
               className="proj grid items-center gap-[22px] p-[18px] min-[861px]:grid-cols-[1.1fr_1fr] min-[861px]:gap-9 min-[861px]:p-6"
@@ -40,7 +42,11 @@ export function Projects({ projects }: Pick<SiteContent, "projects">) {
               </div>
               <div className="grid min-w-0 gap-3.5">
                 {p.tag && <span className="font-mono text-[12.5px] text-muted">{p.tag}</span>}
-                <h3 className="text-[clamp(26px,3vw,36px)] font-extrabold">{p.title}</h3>
+                <h3 className="text-[clamp(26px,3vw,36px)] font-extrabold">
+                  <Link href={`/projets/${p.slug}`} className="no-underline hover:underline">
+                    {p.title}
+                  </Link>
+                </h3>
                 <p className="text-muted">{p.desc}</p>
                 {p.role && (
                   <p className="text-[15px] text-ink">

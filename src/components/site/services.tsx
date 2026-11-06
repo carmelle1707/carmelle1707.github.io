@@ -1,4 +1,6 @@
+import Link from "next/link";
 import type { SiteContent } from "@/lib/content-types";
+import { withSlugs } from "@/lib/slug";
 import { SectionHead } from "./section-head";
 import { ServiceIcon } from "./service-icon";
 
@@ -14,7 +16,7 @@ export function Services({ services }: Pick<SiteContent, "services">) {
           text="Des offres adaptées à la taille de votre activité. Devis gratuit après un premier échange."
         />
         <div className="grid gap-5 perspective-[1000px] min-[901px]:grid-cols-3">
-          {services.map((s) => (
+          {withSlugs(services, (s) => s.title).map((s) => (
             <article
               key={s.id}
               className="svc flex min-w-0 flex-col gap-3.5 p-7"
@@ -40,6 +42,13 @@ export function Services({ services }: Pick<SiteContent, "services">) {
                   <strong className="font-semibold text-ink">Idéal pour</strong> {s.for}
                 </p>
               )}
+              <Link
+                href={`/services/${s.slug}`}
+                className="links mt-1 self-start text-[15px] font-semibold no-underline"
+              >
+                En savoir plus<span className="sr-only"> sur l&apos;offre {s.title}</span>{" "}
+                <span aria-hidden="true">→</span>
+              </Link>
             </article>
           ))}
         </div>
