@@ -3,15 +3,17 @@ import { getPagesContent, projectPath, servicePath } from "@/lib/pages";
 import { siteUrl } from "@/lib/site-url";
 import { PRESENTATION_VIDEO } from "@/lib/video";
 
-/** Accueil, une page par offre et une page par projet publié. */
+/** Accueil, page de la vidéo, une page par offre et une page par projet publié. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const url = siteUrl();
   const { services, projects } = await getPagesContent();
   return [
+    { url: `${url}/`, changeFrequency: "monthly", priority: 1 },
     {
-      url: `${url}/`,
-      changeFrequency: "monthly",
-      priority: 1,
+      // La vidéo est déclarée sur sa page de lecture, seule page où Google l'indexe
+      url: `${url}${PRESENTATION_VIDEO.pagePath}`,
+      changeFrequency: "yearly",
+      priority: 0.9,
       videos: [
         {
           title: PRESENTATION_VIDEO.title,

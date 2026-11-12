@@ -53,28 +53,43 @@ export function structuredData(c: SiteContent, url: string) {
         },
         sameAs,
       },
-      videoData(c, url, personId),
     ],
   };
 }
 
-/** Vidéo de présentation (accueil) : peut apparaître dans l'onglet Vidéos et les résultats Google. */
-function videoData(c: SiteContent, url: string, personId: string) {
+/**
+ * Page de lecture de la vidéo de présentation : c'est ici (et pas sur l'accueil) que Google
+ * peut l'indexer, car la vidéo y est le contenu principal.
+ */
+export function videoPageData(c: SiteContent, url: string) {
   const abs = (path: string) => new URL(path, `${url}/`).toString();
+  const pageUrl = `${url}${PRESENTATION_VIDEO.pagePath}`;
+  const personId = `${url}/#personne`;
   return {
-    "@type": "VideoObject",
-    "@id": `${url}/#video`,
-    name: PRESENTATION_VIDEO.title,
-    description: PRESENTATION_VIDEO.description,
-    thumbnailUrl: [abs(PRESENTATION_VIDEO.square.poster), abs(PRESENTATION_VIDEO.vertical.poster)],
-    uploadDate: PRESENTATION_VIDEO.uploadDate,
-    duration: `PT${PRESENTATION_VIDEO.durationSeconds}S`,
-    contentUrl: abs(PRESENTATION_VIDEO.square.src),
-    embedUrl: `${url}/#video`,
-    inLanguage: "en",
-    creator: { "@id": personId },
-    about: { "@id": personId },
-    publisher: { "@id": personId, "@type": "Person", name: c.profile.name },
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "VideoObject",
+        "@id": `${pageUrl}#video`,
+        name: PRESENTATION_VIDEO.title,
+        description: PRESENTATION_VIDEO.description,
+        thumbnailUrl: [
+          abs(PRESENTATION_VIDEO.square.poster),
+          abs(PRESENTATION_VIDEO.vertical.poster),
+        ],
+        uploadDate: PRESENTATION_VIDEO.uploadDate,
+        duration: `PT${PRESENTATION_VIDEO.durationSeconds}S`,
+        contentUrl: abs(PRESENTATION_VIDEO.square.src),
+        url: pageUrl,
+        inLanguage: "en",
+        creator: { "@id": personId, "@type": "Person", name: c.profile.name },
+        about: { "@id": personId },
+      },
+      breadcrumbData(url, [
+        { name: "Accueil", path: "/" },
+        { name: "Vidéo de présentation", path: PRESENTATION_VIDEO.pagePath },
+      ]),
+    ],
   };
 }
 

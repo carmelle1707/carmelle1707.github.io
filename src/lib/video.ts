@@ -4,6 +4,11 @@
  * Une seule source pour la section du site, le sitemap vidéo et les données structurées.
  */
 export const PRESENTATION_VIDEO = {
+  /**
+   * Page de lecture dédiée : Google n'indexe une vidéo que si elle est le contenu principal
+   * de sa page (« La vidéo n'est pas sur une page de lecture » sur l'accueil).
+   */
+  pagePath: "/video",
   title: "Ange Carmelle Gbedji · Développeuse web et mobile à Abidjan",
   description:
     "Présentation en 60 secondes d'Ange Carmelle Gbedji, développeuse web et mobile freelance à Abidjan : son parcours, ses projets (Flot, YOWL, CinéScope, Post-it) et les technologies qu'elle utilise, du web au mobile.",

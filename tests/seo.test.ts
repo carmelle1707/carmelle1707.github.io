@@ -10,6 +10,7 @@ import {
   projectPageData,
   servicePageData,
   structuredData,
+  videoPageData,
 } from "@/lib/structured-data";
 
 // Hors de Next.js, le cache "use cache" n'existe pas : on sert directement le contenu de départ
@@ -51,7 +52,8 @@ describe("SEO", () => {
     expect(urls).toContain("https://ange-carmelle.dev/services/application-mobile");
     expect(urls).toContain("https://ange-carmelle.dev/projets/flot-mom-global-reporting");
     expect(urls).toContain("https://ange-carmelle.dev/projets/cinescope");
-    expect(urls).toHaveLength(1 + 3 + 4);
+    expect(urls).toContain("https://ange-carmelle.dev/video");
+    expect(urls).toHaveLength(1 + 1 + 3 + 4);
   });
 
   it("JSON-LD : Person et ProfessionalService reliés, URLs absolues, services listés", () => {
@@ -90,28 +92,40 @@ describe("SEO", () => {
     });
   });
 
-  it("JSON-LD de l'accueil : la vidéo de présentation et les variantes du nom", () => {
+  it("JSON-LD de l'accueil : variantes du nom, et pas de vidéo (elle a sa page de lecture)", () => {
     const graph = homeGraph();
     const person = graph.find((n) => n["@type"] === "Person");
-    const video = graph.find((n) => n["@type"] === "VideoObject");
     expect(person).toMatchObject({
       alternateName: expect.arrayContaining(["Ange Carmelle", "Carmelle Gbedji"]),
     });
-    expect(video).toMatchObject({
-      contentUrl: "https://ange-carmelle.dev/videos/presentation-carre.mp4",
-      duration: "PT60S",
-      uploadDate: "2026-11-04",
-      creator: { "@id": "https://ange-carmelle.dev/#personne" },
-      thumbnailUrl: expect.arrayContaining([
-        "https://ange-carmelle.dev/videos/presentation-carre.jpg",
-      ]),
-    });
+    expect(graph.some((n) => n["@type"] === "VideoObject")).toBe(false);
   });
 
-  it("le sitemap déclare la vidéo sur l'accueil", async () => {
+  it("JSON-LD de la page /video : la vidéo, reliée à la personne, avec fil d'Ariane", () => {
+    const url = "https://ange-carmelle.dev";
+    const [video, crumbs] = videoPageData(starterContent(), url)["@graph"] as Record<
+      string,
+      unknown
+    >[];
+    expect(video).toMatchObject({
+      "@type": "VideoObject",
+      url: `${url}/video`,
+      contentUrl: `${url}/videos/presentation-carre.mp4`,
+      duration: "PT60S",
+      uploadDate: "2026-11-04",
+      creator: { "@id": `${url}/#personne` },
+      thumbnailUrl: expect.arrayContaining([`${url}/videos/presentation-carre.jpg`]),
+    });
+    expect(crumbs).toMatchObject({ "@type": "BreadcrumbList" });
+  });
+
+  it("le sitemap déclare la vidéo sur sa page de lecture, pas sur l'accueil", async () => {
     process.env.NEXT_PUBLIC_SITE_URL = "https://ange-carmelle.dev";
-    const [home] = await sitemap();
-    expect(home.videos?.[0]).toMatchObject({
+    const entries = await sitemap();
+    const home = entries.find((e) => e.url === "https://ange-carmelle.dev/");
+    const page = entries.find((e) => e.url === "https://ange-carmelle.dev/video");
+    expect(home?.videos).toBeUndefined();
+    expect(page?.videos?.[0]).toMatchObject({
       content_loc: "https://ange-carmelle.dev/videos/presentation-carre.mp4",
       thumbnail_loc: "https://ange-carmelle.dev/videos/presentation-carre.jpg",
       duration: 60,
