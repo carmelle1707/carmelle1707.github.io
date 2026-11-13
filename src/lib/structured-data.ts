@@ -13,19 +13,48 @@ export function structuredData(c: SiteContent, url: string) {
   const personId = `${url}/#personne`;
   const telephone = c.contact.whatsapp.replace(/[^\d+]/g, "") || undefined;
 
+  const alternateName = nameVariants(c.profile.name, c.profile.shortName);
+  const photo = absolute(c.profile.photo?.url);
+
   return {
     "@context": "https://schema.org",
     "@graph": [
+      {
+        // Nom du site affiché par Google au-dessus du lien (à la place de « vercel.app »)
+        "@type": "WebSite",
+        "@id": `${url}/#site`,
+        name: c.profile.name,
+        alternateName,
+        url: `${url}/`,
+        inLanguage: "fr",
+        publisher: { "@id": personId },
+      },
+      {
+        // Page de profil : Google comprend que l'accueil présente cette personne
+        "@type": "ProfilePage",
+        "@id": `${url}/#profil`,
+        url: `${url}/`,
+        name: `${c.profile.name} · ${c.profile.role}`,
+        isPartOf: { "@id": `${url}/#site` },
+        mainEntity: { "@id": personId },
+        primaryImageOfPage: photo ? { "@type": "ImageObject", url: photo } : undefined,
+        inLanguage: "fr",
+      },
       {
         "@type": "Person",
         "@id": personId,
         name: c.profile.name,
         // Variantes sous lesquelles on peut la chercher (« Ange Carmelle », « Carmelle Gbedji »…)
-        alternateName: nameVariants(c.profile.name, c.profile.shortName),
+        alternateName,
         jobTitle: c.profile.role,
         description: c.profile.lead,
         url,
-        image: absolute(c.profile.photo?.url),
+        image: photo,
+        // Formations et programmes du parcours, repris tels que saisis dans l'admin
+        alumniOf: c.education.length
+          ? c.education.map((e) => ({ "@type": "EducationalOrganization", name: e.title }))
+          : undefined,
+        workLocation: { "@type": "Place", name: "Abidjan, Côte d'Ivoire" },
         email: c.contact.email || undefined,
         address: { "@type": "PostalAddress", addressLocality: "Abidjan", addressCountry: "CI" },
         knowsLanguage: c.profile.language || undefined,
@@ -38,7 +67,7 @@ export function structuredData(c: SiteContent, url: string) {
         name: `${c.profile.name} · ${c.profile.role}`,
         description: stripEmphasis(c.profile.headline),
         url,
-        image: absolute(c.profile.photo?.url),
+        image: photo,
         telephone,
         founder: { "@id": personId },
         areaServed: { "@type": "Country", name: "Côte d'Ivoire" },

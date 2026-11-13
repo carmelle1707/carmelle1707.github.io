@@ -12,6 +12,13 @@ export const metadata: Metadata = {
     ? { google: process.env.GOOGLE_SITE_VERIFICATION }
     : undefined,
   title: "Ange Carmelle Gbedji",
+  applicationName: "Ange Carmelle Gbedji",
+  // Autorise Google à afficher la photo en grand et des extraits complets dans ses résultats
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
   description:
     "Ange Carmelle Gbedji, développeuse web et mobile freelance à Abidjan. Sites vitrines, applications web et applications mobiles pour PME, commerces et startups.",
 };

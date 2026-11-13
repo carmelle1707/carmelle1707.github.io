@@ -72,6 +72,22 @@ describe("SEO", () => {
     expect(String(service?.description)).not.toContain("*");
   });
 
+  it("JSON-LD : nom du site et page de profil centrée sur la personne, avec sa photo", () => {
+    const graph = homeGraph();
+    const person = graph.find((n) => n["@type"] === "Person");
+    expect(graph.find((n) => n["@type"] === "WebSite")).toMatchObject({
+      name: "Ange Carmelle Gbedji",
+      url: "https://ange-carmelle.dev/",
+    });
+    expect(graph.find((n) => n["@type"] === "ProfilePage")).toMatchObject({
+      mainEntity: { "@id": person?.["@id"] },
+      primaryImageOfPage: { url: "https://ange-carmelle.dev/images/photo-profil.jpeg" },
+    });
+    expect(person?.alumniOf).toEqual(
+      expect.arrayContaining([expect.objectContaining({ name: "WeCode" })]),
+    );
+  });
+
   it("JSON-LD des pages d'offre et de projet : reliés à la personne, avec fil d'Ariane", () => {
     const c = starterContent();
     const url = "https://ange-carmelle.dev";
