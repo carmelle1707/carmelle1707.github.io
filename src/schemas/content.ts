@@ -10,6 +10,7 @@ export const profileSchema = z.object({
   status: optionalText(80),
   headline: requiredText("Le grand titre", 160),
   lead: requiredText("Le texte d'introduction", 600),
+  bio: optionalText(900),
   photo: mediaSchema,
   location: optionalText(60),
   language: optionalText(60),

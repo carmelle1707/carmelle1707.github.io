@@ -61,6 +61,7 @@ export async function getSiteContent(): Promise<SiteContent> {
       status: profile.status,
       headline: profile.headline,
       lead: profile.lead,
+      bio: profile.bio ?? "",
       photo: media(profile.photo),
       location: profile.location,
       language: profile.language,

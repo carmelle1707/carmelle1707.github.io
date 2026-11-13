@@ -37,6 +37,7 @@ export async function getAdminProfile(): Promise<SiteContent["profile"]> {
     status: p.status,
     headline: p.headline,
     lead: p.lead,
+    bio: p.bio ?? "",
     photo: media(p.photo),
     location: p.location,
     language: p.language,

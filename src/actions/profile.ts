@@ -17,6 +17,7 @@ const PROFILE_TEXT = [
   "status",
   "headline",
   "lead",
+  "bio",
   "location",
   "language",
   "response",

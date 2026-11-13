@@ -83,6 +83,7 @@ describe("SEO", () => {
       mainEntity: { "@id": person?.["@id"] },
       primaryImageOfPage: { url: "https://ange-carmelle.dev/images/photo-profil.jpeg" },
     });
+    expect(String(person?.description)).toMatch(/^Ange Carmelle Gbedji est une développeuse/);
     expect(person?.alumniOf).toEqual(
       expect.arrayContaining([expect.objectContaining({ name: "WeCode" })]),
     );

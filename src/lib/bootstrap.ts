@@ -4,7 +4,7 @@ import contentJson from "../../data/content.json";
 import { contentFromFile } from "@/lib/content-from-file";
 import { connectDb } from "@/lib/db";
 import { hasContent, seedContent, upsertAdmin } from "@/lib/seed";
-import { AdminUser, RateLimit } from "@/models";
+import { AdminUser, Profile, RateLimit } from "@/models";
 import { adminSeedSchema } from "@/schemas/auth";
 import { contentFileSchema } from "@/schemas/content-file";
 
@@ -34,6 +34,17 @@ async function run() {
       await seedContent(contentFromFile(contentFileSchema.parse(contentJson)));
       console.log("[premier démarrage] contenu importé depuis data/content.json");
     }
+  }
+
+  // Champ ajouté après la mise en ligne : un profil qui ne l'a jamais eu reçoit la biographie
+  // du fichier. Dès qu'elle est enregistrée depuis l'admin (même vide), elle n'est plus touchée.
+  const bio = contentFileSchema.parse(contentJson).profile.bio;
+  if (bio) {
+    const added = await Profile.updateOne(
+      { key: "main", bio: { $exists: false } },
+      { $set: { bio } },
+    );
+    if (added.modifiedCount) console.log("[démarrage] biographie ajoutée au profil");
   }
 
   // ADMIN_EMAIL / ADMIN_PASSWORD (variables Vercel) font foi : les changer puis redéployer

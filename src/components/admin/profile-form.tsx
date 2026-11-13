@@ -70,6 +70,15 @@ export function ProfileForm({ profile: p, uploadsEnabled }: Props) {
           maxLength={600}
         />
         <TextField
+          name="bio"
+          label="Biographie"
+          defaultValue={p.bio}
+          error={errors.bio}
+          hint="Quelques phrases vraies sur vous, à la troisième personne (« Ange Carmelle Gbedji est… ») : Google s'en sert pour vous présenter. Affichée dans la section Parcours."
+          rows={5}
+          maxLength={900}
+        />
+        <TextField
           name="badge"
           label="Texte du cercle qui tourne"
           defaultValue={p.badge}

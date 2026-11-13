@@ -47,7 +47,8 @@ export function structuredData(c: SiteContent, url: string) {
         // Variantes sous lesquelles on peut la chercher (« Ange Carmelle », « Carmelle Gbedji »…)
         alternateName,
         jobTitle: c.profile.role,
-        description: c.profile.lead,
+        // La biographie décrit la personne ; l'introduction décrit plutôt l'offre
+        description: c.profile.bio || c.profile.lead,
         url,
         image: photo,
         // Formations et programmes du parcours, repris tels que saisis dans l'admin

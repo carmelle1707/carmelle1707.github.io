@@ -56,6 +56,19 @@ describe("premier démarrage", () => {
     expect(await Service.countDocuments()).toBe(0);
   });
 
+  it("ajoute la biographie à un profil qui ne l'a jamais eue, sans écraser celle de l'admin", async () => {
+    const base = { key: "main", name: "X", shortName: "X", role: "R", headline: "H", lead: "L" };
+    // Profil créé avant l'ajout du champ : pas de clé « bio » du tout
+    await Profile.collection.insertOne({ ...base });
+    await ensureBootstrap();
+    expect((await Profile.findOne().lean())?.bio).toMatch(/^Ange Carmelle Gbedji est/);
+
+    await Profile.updateOne({ key: "main" }, { $set: { bio: "Texte saisi dans l'admin." } });
+    reset();
+    await ensureBootstrap();
+    expect((await Profile.findOne().lean())?.bio).toBe("Texte saisi dans l'admin.");
+  });
+
   it("aligne le compte admin sur ADMIN_EMAIL / ADMIN_PASSWORD (changement de mot de passe)", async () => {
     vi.stubEnv("ADMIN_EMAIL", "moi@exemple.ci");
     vi.stubEnv("ADMIN_PASSWORD", "ancien-mot-de-passe");

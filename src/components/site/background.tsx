@@ -7,9 +7,21 @@ export function Background({
   education,
   profile,
 }: Pick<SiteContent, "skills" | "education" | "profile">) {
-  if (!skills.length && !education.length) return null;
+  if (!skills.length && !education.length && !profile.bio) return null;
   return (
-    <section id="parcours" className="py-24" aria-label="Compétences et parcours">
+    <section id="parcours" className="py-24" aria-label="À propos, compétences et parcours">
+      {profile.bio && (
+        // Présentation factuelle : c'est le texte que Google reprend pour la décrire
+        <div className="wrap mb-20">
+          <SectionHead id="apropos-title" eyebrow="À propos" title="En *quelques mots*" compact />
+          <p
+            className="max-w-[780px] text-[clamp(18px,2vw,21px)] leading-[1.6] text-pretty"
+            data-reveal
+          >
+            {profile.bio}
+          </p>
+        </div>
+      )}
       <div className="wrap grid gap-16 min-[861px]:grid-cols-2 min-[861px]:gap-14">
         {skills.length > 0 && (
           <div>

@@ -10,6 +10,7 @@ export const contentFileSchema = z.object({
     status: z.string(),
     headline: z.string(),
     lead: z.string(),
+    bio: z.string().default(""),
     photo: z.string(),
     location: z.string(),
     language: z.string(),

@@ -29,6 +29,7 @@ const profileSchema = new Schema(
     status: { type: String, default: "" },
     headline: { type: String, required: true },
     lead: { type: String, required: true },
+    bio: { type: String, default: "" },
     photo: mediaField,
     location: { type: String, default: "" },
     language: { type: String, default: "" },
