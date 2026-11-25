@@ -1,4 +1,6 @@
+import Image from "next/image";
 import type { SiteContent } from "@/lib/content-types";
+import { PORTRAIT } from "@/lib/portrait";
 import { SectionHead } from "./section-head";
 
 /** Compétences et parcours, côte à côte sur desktop. */
@@ -12,14 +14,29 @@ export function Background({
     <section id="parcours" className="py-24" aria-label="À propos, compétences et parcours">
       {profile.bio && (
         // Présentation factuelle : c'est le texte que Google reprend pour la décrire
-        <div className="wrap mb-20">
-          <SectionHead id="apropos-title" eyebrow="À propos" title="En *quelques mots*" compact />
-          <p
-            className="max-w-[780px] text-[clamp(18px,2vw,21px)] leading-[1.6] text-pretty"
-            data-reveal
-          >
-            {profile.bio}
-          </p>
+        <div className="wrap mb-20 grid items-center gap-10 min-[861px]:grid-cols-[1fr_300px] min-[861px]:gap-14">
+          <div>
+            <SectionHead id="apropos-title" eyebrow="À propos" title="En *quelques mots*" compact />
+            <p
+              className="max-w-[780px] text-[clamp(18px,2vw,21px)] leading-[1.6] text-pretty"
+              data-reveal
+            >
+              {profile.bio}
+            </p>
+          </div>
+          <figure className="m-0 max-w-[300px]" data-reveal>
+            <Image
+              src={PORTRAIT.src}
+              alt={PORTRAIT.alt}
+              width={PORTRAIT.width}
+              height={PORTRAIT.height}
+              sizes="300px"
+              className="aspect-[4/5] w-full rounded-[22px] object-cover object-[50%_30%]"
+            />
+            <figcaption className="mt-3 font-mono text-xs tracking-[0.08em] text-muted uppercase">
+              {profile.name} · Abidjan
+            </figcaption>
+          </figure>
         </div>
       )}
       <div className="wrap grid gap-16 min-[861px]:grid-cols-2 min-[861px]:gap-14">

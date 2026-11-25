@@ -1,14 +1,23 @@
 import type { MetadataRoute } from "next";
 import { getPagesContent, projectPath, servicePath } from "@/lib/pages";
+import { PORTRAIT } from "@/lib/portrait";
 import { siteUrl } from "@/lib/site-url";
 import { PRESENTATION_VIDEO } from "@/lib/video";
 
 /** Accueil, page de la vidéo, une page par offre et une page par projet publié. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const url = siteUrl();
-  const { services, projects } = await getPagesContent();
+  const { content, services, projects } = await getPagesContent();
+  const absolute = (path: string) => new URL(path, `${url}/`).toString();
+  // Photos de la personne visibles sur l'accueil, déclarées pour Google Images
+  const photos = [content.profile.photo?.url, PORTRAIT.src].filter((p): p is string => !!p);
   return [
-    { url: `${url}/`, changeFrequency: "monthly", priority: 1 },
+    {
+      url: `${url}/`,
+      changeFrequency: "monthly",
+      priority: 1,
+      images: photos.map(absolute),
+    },
     {
       // La vidéo est déclarée sur sa page de lecture, seule page où Google l'indexe
       url: `${url}${PRESENTATION_VIDEO.pagePath}`,

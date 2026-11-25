@@ -1,5 +1,6 @@
 import type { SiteContent } from "@/lib/content-types";
 import { stripEmphasis } from "@/lib/rich-title";
+import { PORTRAIT } from "@/lib/portrait";
 import { PRESENTATION_VIDEO } from "@/lib/video";
 
 /**
@@ -50,7 +51,8 @@ export function structuredData(c: SiteContent, url: string) {
         // La biographie décrit la personne ; l'introduction décrit plutôt l'offre
         description: c.profile.bio || c.profile.lead,
         url,
-        image: photo,
+        // Photo principale puis le portrait de « À propos » : les deux images de la personne
+        image: [photo, absolute(PORTRAIT.src)].filter(Boolean),
         // Formations et programmes du parcours, repris tels que saisis dans l'admin
         alumniOf: c.education.length
           ? c.education.map((e) => ({ "@type": "EducationalOrganization", name: e.title }))

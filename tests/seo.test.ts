@@ -61,7 +61,10 @@ describe("SEO", () => {
     const person = graph.find((n) => n["@type"] === "Person");
     const service = graph.find((n) => n["@type"] === "ProfessionalService");
     expect(person).toMatchObject({
-      image: "https://ange-carmelle.dev/images/photo-profil.jpeg",
+      image: [
+        "https://ange-carmelle.dev/images/photo-profil.jpeg",
+        "https://ange-carmelle.dev/images/ange-carmelle-gbedji-portrait.jpg",
+      ],
       sameAs: expect.arrayContaining(["https://github.com/carmelle1707"]),
     });
     expect(service).toMatchObject({
@@ -142,6 +145,10 @@ describe("SEO", () => {
     const home = entries.find((e) => e.url === "https://ange-carmelle.dev/");
     const page = entries.find((e) => e.url === "https://ange-carmelle.dev/video");
     expect(home?.videos).toBeUndefined();
+    expect(home?.images).toEqual([
+      "https://ange-carmelle.dev/images/photo-profil.jpeg",
+      "https://ange-carmelle.dev/images/ange-carmelle-gbedji-portrait.jpg",
+    ]);
     expect(page?.videos?.[0]).toMatchObject({
       content_loc: "https://ange-carmelle.dev/videos/presentation-carre.mp4",
       thumbnail_loc: "https://ange-carmelle.dev/videos/presentation-carre.jpg",
