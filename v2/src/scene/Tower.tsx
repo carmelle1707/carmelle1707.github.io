@@ -138,7 +138,7 @@ function CameraRig({ reduced, wide }: { reduced: boolean; wide: boolean }) {
     const pose = targetPose(wide, size.height);
     goalPos.set(...pose.camera);
     goalLook.set(...pose.target);
-    const lambda = reduced ? 1000 : 3.4;
+    const lambda = reduced ? 1000 : 4.1;
     const k = 1 - Math.exp(-lambda * delta);
     camera.position.lerp(goalPos, k);
     look.current.lerp(goalLook, k);
@@ -188,7 +188,7 @@ function KeyLight({ reduced }: { reduced: boolean }) {
     l.position.x = THREE.MathUtils.damp(l.position.x, 6 + pointer.x * 5, 3, delta);
     l.position.y = THREE.MathUtils.damp(l.position.y, 10 - pointer.y * 3, 3, delta);
   });
-  return <directionalLight ref={light} position={[6, 10, 5]} intensity={1.9} />;
+  return <directionalLight ref={light} position={[6, 10, 5]} color="#fff4df" intensity={2.05} />;
 }
 
 /** Mélange jour → nuit d'une couleur de la palette, selon la part de bleu nuit à l'écran. */
@@ -286,8 +286,8 @@ function Slab({ index, day, night, reduced, started }: { index: number } & Omit<
 
   return (
     <group ref={group} position={[first.x, first.y + drop.current.v, 0]} visible={reduced}>
-      <RoundedBox args={[SLAB.width, SLAB.height, SLAB.depth]} radius={0.045} smoothness={3}>
-        <meshStandardMaterial ref={material} color={day.slab} roughness={0.92} metalness={0} transparent />
+      <RoundedBox args={[SLAB.width, SLAB.height, SLAB.depth]} radius={0.055} smoothness={5}>
+        <meshStandardMaterial ref={material} color={day.slab} roughness={0.84} metalness={0} transparent />
         <Edges threshold={20}>
           <lineBasicMaterial ref={edges} color={day.edge} transparent />
         </Edges>
@@ -486,7 +486,8 @@ export function Tower({ day, night, reduced, wide, started }: Props) {
       <CameraRig reduced={reduced} wide={wide} />
       <hemisphereLight args={["#ffffff", "#c9d1dd", 1.6]} />
       <KeyLight reduced={reduced} />
-      <directionalLight position={[-6, 4, -3]} intensity={0.4} />
+      <directionalLight position={[-6, 4, -3]} color="#b8c9e8" intensity={0.48} />
+      <pointLight position={[-4.5, 5.5, 5]} color="#d9ad70" intensity={0.72} distance={18} decay={2} />
       <Spin reduced={reduced}>
         {LAYERS.map((l, i) => (
           <Slab key={l.id} index={i} day={day} night={night} reduced={reduced} started={ready} />

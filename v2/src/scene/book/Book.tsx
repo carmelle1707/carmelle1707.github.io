@@ -99,7 +99,7 @@ function shape(leaf: Leaf, p: number) {
       arr[k + 1] = y;
       arr[k + 2] = z;
       const sn = (i + 0.5) / SX;
-      const bend = lift * Math.pow(sn, 1.6) * ((1 - 2 * p) * (0.7 + 0.8 * zn) - 0.35);
+      const trailing = (1 - 2 * p) * (0.7 + 0.8 * zn) - 0.35;\n      const cornerCurl = Math.sin(sn * Math.PI) * (zn - 0.5) * 0.16;\n      const bend = lift * Math.pow(sn, 1.6) * (trailing + cornerCurl);
       const a = Math.min(Math.PI, Math.max(0, theta + bend));
       x += Math.cos(a) * ds;
       y += Math.sin(a) * ds;
