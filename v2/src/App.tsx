@@ -5,7 +5,7 @@ import { detectSceneMode, useReducedMotion, useWideScreen, type SceneMode } from
 import { setStage } from "./state/store";
 import type { SectionId } from "./content/site";
 
-type StageProps = { reduced: boolean; wide: boolean; onReady: () => void; onDecline: () => void };
+type StageProps = { reduced: boolean; wide: boolean; waiting: boolean; onReady: () => void; onDecline: () => void };
 
 const BOOT_KEY = "carmelle-boot";
 
@@ -83,7 +83,11 @@ export default function App() {
     mode === "still" ? (
       <Still />
     ) : Stage ? (
-      <Stage reduced={reduced} wide={wide} onReady={() => setFrame(true)} onDecline={() => setMode("still")} />
+      <Stage
+        reduced={reduced}
+        wide={wide}
+        waiting={boot}
+        onReady={() => setFrame(true)} onDecline={() => setMode("still")} />
     ) : null;
 
   return (

@@ -426,6 +426,12 @@ html[data-boot="1"]::before {
   color: var(--color-steel);
   background: var(--color-paper);
   pointer-events: none;
+  animation: annotation-in 0.4s ease-out both;
+}
+@keyframes annotation-in {
+  from {
+    opacity: 0;
+  }
 }
 .annotation.is-active {
   color: var(--color-ink);
