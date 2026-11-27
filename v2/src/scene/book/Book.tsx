@@ -8,8 +8,8 @@ import { BOOK, BOOK_Y } from "../poses";
 import { drawBlank, drawCover, drawSheet, drawShot, makePage, shadowTexture } from "./pages";
 
 /** Subdivisions d'une feuille : 36 le long de la largeur (la courbure), 10 dans la hauteur (la torsion du coin). */
-const SX = 36;
-const SZ = 10;
+const SX = 48;
+const SZ = 14;
 /** Épaisseurs : le plat de dos, le bloc de pages, l'écart entre deux feuilles posées. */
 const BOARD = 0.03;
 const BLOCK = 0.05;
