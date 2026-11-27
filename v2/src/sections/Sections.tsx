@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { CONTACT, LAYERS, NAV, PROFILE, PROJECTS, STEPS, TOOLS, type SectionId } from "../content/site";
+import { CONTACT, LAYERS, NAV, PROFILE, PROJECTS, STEPS, TOOLS, WECODE_PHOTOS, type SectionId } from "../content/site";
+import { ContactForm } from "./ContactForm";
 import { setStage, useStage } from "../state/store";
 
 /** Un fait que le contenu ne donne pas encore : un emplacement visible, jamais une valeur inventée. */
@@ -89,11 +90,17 @@ export function About() {
           decoding="async"
         />
       </figure>
-      <p>
-        Je suis développeuse full stack, formée chez WeCode et à l'Université Virtuelle de Côte d'Ivoire. Au Groupe
-        Tasnim, j'ai travaillé sur le front-end, le back-end, l'intégration d'API et les tests fonctionnels.
-      </p>
-      <p>Je maquette sur Figma avant d'écrire la première ligne, et je suis de près l'intelligence artificielle.</p>
+      <p>{PROFILE.bio}</p>
+      <figure className="gallery">
+        <ul>
+          {WECODE_PHOTOS.map((p) => (
+            <li key={p.src}>
+              <img src={p.src} alt={p.alt} width={p.width} height={p.height} loading="lazy" decoding="async" />
+            </li>
+          ))}
+        </ul>
+        <figcaption>Remise des attestations WeCode, Abidjan</figcaption>
+      </figure>
     </Section>
   );
 }
@@ -138,6 +145,7 @@ export function Skills() {
 export function Projects() {
   const current = useStage((s) => s.project);
   const project = PROJECTS.find((p) => p.slug === current) ?? PROJECTS[0];
+  if (!project) return null;
   return (
     <Section id="projets" className="projects" labelledBy="projects-title">
       <h2 id="projects-title">Chaque projet a sa propre pile</h2>
@@ -170,7 +178,7 @@ export function Projects() {
           />
         ) : (
           <div className="project-shot project-shot-empty">
-            <Fill>Capture d'écran à ajouter</Fill>
+            <span>Pas encore de capture</span>
           </div>
         )}
         {project.desc && <p>{project.desc}</p>}
@@ -194,10 +202,7 @@ export function Projects() {
             </div>
           )}
         </dl>
-        {project.missing && project.image && <Fill>{project.missing}</Fill>}
-        {project.missing && !project.image && project.missing !== "Capture d'écran à ajouter" && (
-          <Fill>{project.missing}</Fill>
-        )}
+        {project.missing && <Fill>{project.missing}</Fill>}
         {project.links.length > 0 && (
           <p className="project-links">
             {project.links.map((l) => (
@@ -216,10 +221,11 @@ export function Steps() {
   return (
     <Section id="etapes" className="steps" labelledBy="steps-title">
       <h2 id="steps-title">Le parcours, de bas en haut</h2>
+      {/* Une étape surlignée par plaque : au-delà de cinq, la frise continue sans la tour. */}
       <ol className="timeline" onMouseLeave={() => setStage({ step: null })}>
         {STEPS.map((s, i) => (
           <li key={s.title} onMouseEnter={() => setStage({ step: i })}>
-            <p className="timeline-period">{s.period || <Fill>{s.missing}</Fill>}</p>
+            <p className="timeline-period">{s.period}</p>
             <h3>{s.title}</h3>
             <p>{s.desc}</p>
           </li>
@@ -234,31 +240,46 @@ export function Contact() {
     <Section id="contact" className="contact" labelledBy="contact-title">
       <h2 id="contact-title">Un projet en tête&nbsp;? Écrivez-moi.</h2>
       <p className="section-lead">Je réponds sous 24 h.</p>
+      <ContactForm />
       <ul className="contact-list">
-        <li>
-          <span>WhatsApp</span>
-          <a href={CONTACT.whatsapp.href} target="_blank" rel="noopener">
-            {CONTACT.whatsapp.label}
-          </a>
-        </li>
-        <li>
-          <span>LinkedIn</span>
-          <a href={CONTACT.linkedin} target="_blank" rel="noopener">
-            Ange Carmelle Gbedji
-          </a>
-        </li>
-        <li>
-          <span>GitHub</span>
-          <a href={CONTACT.github} target="_blank" rel="noopener">
-            carmelle1707
-          </a>
-        </li>
-        <li>
-          <span>CV</span>
-          <a href={PROFILE.cv} target="_blank" rel="noopener">
-            Télécharger le PDF
-          </a>
-        </li>
+        {CONTACT.whatsapp && (
+          <li>
+            <span>WhatsApp</span>
+            <a href={CONTACT.whatsapp.href} target="_blank" rel="noopener">
+              {CONTACT.whatsapp.label}
+            </a>
+          </li>
+        )}
+        {CONTACT.email && (
+          <li>
+            <span>Email</span>
+            <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+          </li>
+        )}
+        {CONTACT.linkedin && (
+          <li>
+            <span>LinkedIn</span>
+            <a href={CONTACT.linkedin} target="_blank" rel="noopener">
+              {PROFILE.name}
+            </a>
+          </li>
+        )}
+        {CONTACT.github && (
+          <li>
+            <span>GitHub</span>
+            <a href={CONTACT.github} target="_blank" rel="noopener">
+              {CONTACT.github.replace(/^https?:\/\/(www\.)?github\.com\//, "")}
+            </a>
+          </li>
+        )}
+        {PROFILE.cv && (
+          <li>
+            <span>CV</span>
+            <a href={PROFILE.cv} target="_blank" rel="noopener">
+              Télécharger le PDF
+            </a>
+          </li>
+        )}
       </ul>
     </Section>
   );

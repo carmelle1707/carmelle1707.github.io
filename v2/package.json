@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc -b",
-    "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "content": "node scripts/fetch-content.mjs",
+    "build": "node scripts/fetch-content.mjs && tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "lint": "eslint .",
     "test": "vitest run",
     "preview": "vite preview"

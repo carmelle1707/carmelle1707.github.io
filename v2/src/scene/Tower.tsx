@@ -398,7 +398,8 @@ function Labels({ palette, started, reduced }: { palette: ScenePalette; started:
       {LAYERS.map((l, i) => {
         const y = slabY(i, spread);
         // Sur les étapes, l'année seule : la ligne de la frise donne le reste.
-        const text = section === "etapes" ? STEPS[i].period.split(",")[0] || "à compléter" : l.name;
+        const text = section === "etapes" ? (STEPS[i]?.period.split(",")[0] ?? "") : l.name;
+        if (!text) return null;
         const active = section === "competences" ? layer === l.id : step === i;
         return (
           <group key={l.id}>

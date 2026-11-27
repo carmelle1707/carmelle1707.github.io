@@ -1,0 +1,164 @@
+{
+  "profile": {
+    "name": "Ange Carmelle Gbedji",
+    "shortName": "Ange Carmelle",
+    "role": "Développeuse web & mobile",
+    "bio": "Ange Carmelle Gbedji est une développeuse full-stack basée à Abidjan, spécialisée en développement web et mobile. Elle suit la formation développement full stack et mobile de WeCode et a effectué un stage au sein du Groupe Tasnim. Elle intervient sur le frontend, le backend, l'intégration d'API et les tests fonctionnels, et travaille en autonomie sur Figma. Intéressée par l'intelligence artificielle, elle se décrit comme rigoureuse, curieuse et adaptable.",
+    "location": "Abidjan, CI",
+    "photo": {
+      "url": "/images/photo-profil.jpeg",
+      "pathname": ""
+    },
+    "cv": {
+      "url": "/cv.pdf",
+      "pathname": ""
+    }
+  },
+  "contact": {
+    "title": "Un projet en tête ? *Parlons-en.*",
+    "text": "Décrivez-moi votre activité et ce que vous voulez obtenir. Je vous réponds sous 24 h avec des questions et une première estimation.",
+    "whatsapp": "+225 01 05 45 87 67",
+    "email": "",
+    "linkedin": "https://www.linkedin.com/in/ange-carmelle-gbedji-1a11b237a",
+    "github": "https://github.com/carmelle1707"
+  },
+  "projects": [
+    {
+      "slug": "flot-mom-global-reporting",
+      "title": "Flot — MOM Global Reporting",
+      "tag": "Brief équipe Flot · Interface de reporting",
+      "desc": "Module qui centralise les données mensuelles d'une organisation dans un seul tableau de bord, développé d'après la maquette fournie par l'équipe Flot.",
+      "role": "Intégration de la maquette, connexion aux données via l'API, mise en page responsive.",
+      "stack": [
+        "Vue.js",
+        "Laravel",
+        "Inertia",
+        "Tailwind"
+      ],
+      "image": {
+        "url": "/images/flot.png",
+        "pathname": ""
+      },
+      "demoUrl": "",
+      "githubUrl": "https://github.com/carmelle1707"
+    },
+    {
+      "slug": "yowl",
+      "title": "YOWL",
+      "tag": "Projet d'équipe · 4 développeurs",
+      "desc": "Plateforme qui permet de commenter n'importe quel contenu du web depuis un seul endroit, pour centraliser les discussions.",
+      "role": "Développement de fonctionnalités Laravel, base de données SQL et interface en Tailwind.",
+      "stack": [
+        "Laravel",
+        "SQL",
+        "Tailwind"
+      ],
+      "image": {
+        "url": "/images/yowl.png",
+        "pathname": ""
+      },
+      "demoUrl": "",
+      "githubUrl": "https://github.com/carmelle1707"
+    },
+    {
+      "slug": "cinescope",
+      "title": "CinéScope",
+      "tag": "Application web · API externe",
+      "desc": "Application de découverte de films : tendances, films populaires et favoris, alimentée en temps réel par l'API TMDB.",
+      "role": "Consommation d'API, rendu côté serveur avec Next.js, interface responsive.",
+      "stack": [
+        "Next.js",
+        "API TMDB",
+        "Tailwind"
+      ],
+      "image": null,
+      "demoUrl": "",
+      "githubUrl": "https://github.com/carmelle1707"
+    },
+    {
+      "slug": "post-it",
+      "title": "Post-it",
+      "tag": "Application web · Productivité",
+      "desc": "Gestionnaire de notes façon post-it : ajout, modification et suppression de tâches mises à jour en temps réel.",
+      "role": "Composants Vue réutilisables, échanges avec une API.",
+      "stack": [
+        "Vue.js",
+        "CSS",
+        "API REST"
+      ],
+      "image": {
+        "url": "/images/postit.png",
+        "pathname": ""
+      },
+      "demoUrl": "",
+      "githubUrl": "https://github.com/carmelle1707"
+    }
+  ],
+  "skills": [
+    {
+      "group": "Front-end",
+      "items": [
+        "React",
+        "Next.js",
+        "Vue.js",
+        "Tailwind CSS",
+        "JavaScript"
+      ]
+    },
+    {
+      "group": "Back-end",
+      "items": [
+        "Laravel",
+        "PHP",
+        "Node.js",
+        "Express",
+        "Inertia.js"
+      ]
+    },
+    {
+      "group": "Données",
+      "items": [
+        "MySQL",
+        "MongoDB"
+      ]
+    },
+    {
+      "group": "Mobile",
+      "items": [
+        "React Native",
+        "Expo"
+      ]
+    },
+    {
+      "group": "Outils",
+      "items": [
+        "Git",
+        "GitHub",
+        "Figma",
+        "Vercel"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "period": "2026 →",
+      "title": "WeCode",
+      "desc": "Formation développement full stack et mobile par projets concrets : front-end, back-end, API et bases de données."
+    },
+    {
+      "period": "2025 →",
+      "title": "Université Virtuelle de Côte d'Ivoire",
+      "desc": "Licence Développement d'Applications et E-services (en cours)."
+    },
+    {
+      "period": "2025",
+      "title": "Tech For Girls",
+      "desc": "Programmation Python et robotique Arduino."
+    },
+    {
+      "period": "2025",
+      "title": "DigiFemme Côte d'Ivoire",
+      "desc": "Programme JA Social Equity."
+    }
+  ]
+}

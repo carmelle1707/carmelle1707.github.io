@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { LayerId, SectionId } from "../content/site";
+import { PROJECTS, type LayerId, type SectionId } from "../content/site";
 
 /**
  * État partagé entre les sections HTML et la scène 3D : la section lue,
@@ -13,7 +13,7 @@ export type StageState = {
   step: number | null;
 };
 
-let state: StageState = { section: "accueil", layer: null, project: "flot", step: null };
+let state: StageState = { section: "accueil", layer: null, project: PROJECTS[0]?.slug ?? "", step: null };
 const listeners = new Set<() => void>();
 
 export function setStage(patch: Partial<StageState>) {
