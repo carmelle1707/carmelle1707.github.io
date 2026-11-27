@@ -1,48 +1,67 @@
-/* --------------------------------------------------------------------------
-   ART DIRECTION 02 — une couverture éditoriale, une sculpture vivante,
-   puis un récit qui se découvre au scroll. Cette couche complète la V2.
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   CARMELLE — ART DIRECTION / EDITORIAL NOIR & OR
+   Couche visuelle de la V2. Les composants et le système 3D restent intacts.
+   ========================================================================== */
 
 :root {
   --ink-blue: #1d315e;
   --gold-leaf: #c5a36a;
   --gold-light: #e3c995;
-  --hairline: color-mix(in oklab, var(--color-ink) 15%, transparent);
-  --editorial-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --hairline: color-mix(in oklab, var(--color-ink) 14%, transparent);
+  --font-editorial: "Cormorant Garamond", Georgia, "Times New Roman", serif;
 }
 
 html { scroll-behavior: smooth; }
 body { letter-spacing: -0.012em; }
-::selection { color: var(--color-ink); background: color-mix(in oklab, var(--gold-leaf) 42%, transparent); }
+::selection {
+  color: var(--color-ink);
+  background: color-mix(in oklab, var(--gold-leaf) 38%, transparent);
+}
 
+/* Navigation : légère, stable, et lisible au-dessus de la scène. */
 .site-header {
-  background: color-mix(in oklab, var(--color-paper) 82%, transparent);
+  background: color-mix(in oklab, var(--color-paper) 88%, transparent);
   border-bottom-color: var(--hairline);
-  backdrop-filter: blur(20px) saturate(135%);
-  -webkit-backdrop-filter: blur(20px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
 }
 .header-inner { height: 72px; }
-.wordmark { font-size: 1.1rem; letter-spacing: -0.055em; }
+.wordmark {
+  font-size: 1.08rem;
+  letter-spacing: -.055em;
+}
 .wordmark::after { content: " /"; color: var(--gold-leaf); }
-.site-nav ul { gap: clamp(1rem, 2.4vw, 2.4rem); }
-.site-nav a { font-size: .78rem; letter-spacing: .025em; }
+.site-nav ul { gap: clamp(1rem, 2.2vw, 2.2rem); }
+.site-nav a {
+  font-size: .76rem;
+  letter-spacing: .025em;
+}
 
+/* Chapitres : repères éditoriaux alignés sur la grille du contenu. */
 .chapters { isolation: isolate; }
-.chapter > .panel { padding-block: clamp(6rem, 12vw, 11rem); }
+.chapter { position: relative; }
+.chapter > .panel {
+  padding-block: clamp(6.5rem, 11vw, 10rem);
+}
 .chapter h2 {
-  max-width: 10ch;
-  font-size: clamp(2.8rem, 5.8vw, 6rem);
+  max-width: 11ch;
+  font-size: clamp(2.8rem, 5.4vw, 5.8rem);
   line-height: .94;
   letter-spacing: -.075em;
 }
 .chapter:not(.hero)::before {
-  top: clamp(2rem, 4.5vw, 4rem);
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: clamp(2.1rem, 4vw, 3.7rem);
+  left: 0;
   width: 10rem;
-  padding-top: .8rem;
+  padding-top: .75rem;
   border-top: 1px solid var(--gold-leaf);
   color: var(--color-muted);
-  font: 500 .64rem/1 var(--font-outlier);
+  font: 500 .61rem/1.2 var(--font-outlier);
   letter-spacing: .12em;
+  pointer-events: none;
 }
 .chapter[data-section="apropos"]::before { content: "01 — LE PORTRAIT"; }
 .chapter[data-section="parcours"]::before { content: "02 — LE PARCOURS"; }
@@ -50,96 +69,105 @@ body { letter-spacing: -0.012em; }
 .chapter[data-section="projets"]::before { content: "04 — LES PROJETS"; }
 .chapter[data-section="contact"]::before { content: "05 — LA RENCONTRE"; }
 
-.hero > .panel {
-  min-height: min(960px, calc(100svh - 72px));
-  padding-top: clamp(5rem, 12vh, 9rem);
-  padding-bottom: clamp(2rem, 5vh, 4rem);
-}
-.hero-copy {
-  position: relative;
-  z-index: 3;
-  max-width: min(54rem, 62vw);
-  gap: clamp(1.35rem, 2.8vw, 2.7rem);
-}
-.hero-kicker, .editorial-kicker {
+.editorial-kicker,
+.hero-kicker {
+  margin: 0;
   color: var(--gold-leaf);
-  font: 500 .68rem/1.5 var(--font-outlier);
+  font: 500 .65rem/1.6 var(--font-outlier);
   letter-spacing: .12em;
   text-transform: uppercase;
 }
-.hero-kicker span { color: var(--color-muted); padding-inline: .45rem; }
+
+/* Accueil : une couverture typographique à gauche, la sculpture respire à droite. */
+.hero > .panel {
+  min-height: min(940px, calc(100svh - 72px));
+  padding-top: clamp(4.5rem, 10vh, 8rem);
+  padding-bottom: clamp(2rem, 5vh, 4rem);
+}
+.hero-copy {
+  max-width: min(48rem, 53vw);
+  gap: clamp(1.25rem, 2.5vw, 2.25rem);
+}
+.hero-kicker span { padding-inline: .45rem; color: var(--color-muted); }
 .hero h1 {
   max-width: 9ch;
-  font-size: clamp(4.6rem, 10vw, 10rem);
-  line-height: .78;
+  font-size: clamp(4.8rem, 9vw, 9.4rem);
+  line-height: .79;
   letter-spacing: -.095em;
   font-weight: 700;
 }
-.hero h1 .line { padding-bottom: .13em; }
+.hero h1 .line { padding-bottom: .14em; }
 .hero h1 .line:nth-child(2) {
   color: var(--color-muted);
-  font-family: var(--editorial-serif);
+  font-family: var(--font-editorial);
+  font-size: 1.04em;
   font-style: italic;
   font-weight: 400;
-  letter-spacing: -.09em;
+  letter-spacing: -.085em;
 }
 .hero-role {
-  max-width: 35ch;
+  max-width: 34ch;
   color: var(--color-ink-2);
-  font-size: clamp(1.15rem, 1.65vw, 1.55rem);
-  line-height: 1.42;
-  letter-spacing: -.035em;
+  font-size: clamp(1.08rem, 1.45vw, 1.4rem);
+  line-height: 1.5;
+  letter-spacing: -.025em;
 }
-.hero-actions { gap: 1.8rem; margin-top: .35rem; }
-.hero-actions .btn-primary { gap: 1.2rem; }
+.hero-actions { gap: 1.6rem; margin-top: .2rem; }
+.hero-actions .btn-primary { gap: 1.1rem; }
 .btn {
   min-height: 54px;
-  padding-inline: 1.55rem;
+  padding-inline: 1.5rem;
   border-radius: 2px;
-  transition: transform .3s var(--ease-out), background .3s var(--ease-out), box-shadow .3s var(--ease-out);
+  transition:
+    transform .28s var(--ease-out),
+    background-color .28s var(--ease-out),
+    box-shadow .28s var(--ease-out);
 }
 .btn-primary {
   background: var(--ink-blue);
-  box-shadow: 0 12px 36px color-mix(in oklab, var(--ink-blue) 20%, transparent);
+  box-shadow: 0 10px 30px color-mix(in oklab, var(--ink-blue) 18%, transparent);
 }
 .btn-primary:hover {
   background: var(--color-ink);
-  transform: translateY(-3px);
-  box-shadow: 0 18px 40px color-mix(in oklab, var(--ink-blue) 24%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px color-mix(in oklab, var(--ink-blue) 22%, transparent);
 }
 .btn-text { text-decoration-color: var(--gold-leaf); }
 .hero-index {
   position: absolute;
   z-index: 3;
   right: var(--gutter);
-  bottom: clamp(2.5rem, 7vh, 5rem);
+  bottom: clamp(2.3rem, 6vh, 4.5rem);
   display: flex;
   align-items: center;
   gap: .7rem;
   color: var(--color-muted);
-  font: .65rem var(--font-outlier);
+  font: .62rem var(--font-outlier);
   letter-spacing: .12em;
 }
 .hero-index span:first-child { color: var(--gold-leaf); }
-.hero-index i { width: 2.5rem; height: 1px; background: var(--hairline); }
+.hero-index i { width: 2.4rem; height: 1px; background: var(--hairline); }
 .scroll-cue {
-  gap: 1rem;
-  font: .64rem var(--font-outlier);
+  gap: .9rem;
+  font: .61rem var(--font-outlier);
   letter-spacing: .1em;
   text-transform: uppercase;
 }
-.scroll-cue-line { width: 60px; background: var(--gold-leaf); }
+.scroll-cue-line { width: 58px; background: var(--gold-leaf); }
 .hero-still {
-  width: 59%;
-  right: -3%;
-  opacity: .95;
+  width: 57%;
+  right: -2%;
+  opacity: .94;
 }
-.hero-still img { filter: drop-shadow(0 35px 55px color-mix(in oklab, var(--color-ink) 17%, transparent)); }
+.hero-still img {
+  filter: drop-shadow(0 30px 48px color-mix(in oklab, var(--color-ink) 15%, transparent));
+}
 .scene-3d .hero-still { display: none; }
 
+/* Portrait : cadre décalé, légende discrète, photographie authentique préservée. */
 .about-grid {
-  grid-template-columns: minmax(16rem, .8fr) minmax(0, 1.2fr);
-  gap: clamp(3rem, 8vw, 8rem);
+  grid-template-columns: minmax(15rem, .82fr) minmax(0, 1.18fr);
+  gap: clamp(2.75rem, 7vw, 7rem);
   align-items: center;
 }
 .portrait {
@@ -158,196 +186,266 @@ body { letter-spacing: -0.012em; }
 .portrait img {
   aspect-ratio: 4 / 5;
   object-position: center 28%;
-  filter: saturate(.84) contrast(1.02);
+  filter: saturate(.88) contrast(1.02);
 }
 .portrait-caption {
   display: flex;
   flex-wrap: wrap;
   gap: .45rem;
-  padding-top: .85rem;
+  padding-top: .8rem;
   color: var(--color-muted);
-  font: .62rem var(--font-outlier);
+  font: .59rem/1.5 var(--font-outlier);
   letter-spacing: .04em;
   text-transform: uppercase;
 }
 .portrait-caption span { color: var(--gold-leaf); }
-.about-copy { gap: 1.6rem; }
+.about-copy { gap: 1.45rem; }
 .about-copy h2 { max-width: 10ch; }
 .about-bio {
-  max-width: 54ch;
-  font-size: clamp(1.08rem, 1.35vw, 1.35rem);
+  max-width: 53ch;
+  font-size: clamp(1.05rem, 1.25vw, 1.28rem);
   line-height: 1.78;
 }
-.about-bio .k { background-image: linear-gradient(var(--gold-leaf), var(--gold-leaf)); }
-.strip {
-  margin-top: clamp(4rem, 8vw, 8rem);
-  border-top: 1px solid var(--hairline);
-  padding-top: 1.4rem;
+.about-bio .k {
+  background-image: linear-gradient(var(--gold-leaf), var(--gold-leaf));
 }
-.strip li { width: clamp(18rem, 33vw, 32rem); }
-.strip img { aspect-ratio: 16 / 10; border-radius: 0; filter: saturate(.85); }
+.strip {
+  margin-top: clamp(4rem, 7vw, 7rem);
+  border-top: 1px solid var(--hairline);
+  padding-top: 1.25rem;
+}
+.strip li { width: clamp(18rem, 32vw, 30rem); }
+.strip img {
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
+  filter: saturate(.88);
+}
 .strip figcaption {
-  font: .63rem var(--font-outlier);
+  font: .6rem/1.6 var(--font-outlier);
   letter-spacing: .08em;
   text-transform: uppercase;
 }
 
+/* Parcours : ligne fine, cartes aérées, année mise en avant. */
 .timeline-ch .panel { max-width: min(70rem, 78vw); }
-.tl { margin-top: clamp(3.5rem, 8vw, 7rem); }
+.timeline-ch h2 { max-width: 9ch; }
+.tl { margin-top: clamp(3.5rem, 7vw, 6.5rem); }
 .tl-line { background: var(--hairline); }
 .tl-fill { background: linear-gradient(to bottom, var(--gold-leaf), var(--gold-light)); }
-.tl ol { gap: clamp(4rem, 8vw, 7rem); }
-.tl-step { column-gap: clamp(2rem, 8vw, 8rem); }
+.tl ol { gap: clamp(3.5rem, 7vw, 6rem); }
+.tl-step { column-gap: clamp(2rem, 7vw, 7rem); }
 .tl-dot {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   margin-left: -6px;
   border: 2px solid var(--gold-leaf);
   background: var(--color-paper);
-  box-shadow: 0 0 0 7px var(--color-paper);
+  box-shadow: 0 0 0 6px var(--color-paper);
 }
-.tl-year { color: var(--gold-leaf); font: .9rem var(--font-outlier); letter-spacing: .06em; }
-.tl-card h3 { font-size: clamp(1.45rem, 2.2vw, 2.2rem); letter-spacing: -.05em; }
-.tl-card p:last-child { line-height: 1.7; }
+.tl-year {
+  color: var(--gold-leaf);
+  font: .78rem var(--font-outlier);
+  letter-spacing: .06em;
+}
+.tl-card { gap: .65rem; }
+.tl-card h3 {
+  font-size: clamp(1.45rem, 2.1vw, 2.1rem);
+  letter-spacing: -.045em;
+}
+.tl-card p:last-child { max-width: 36ch; line-height: 1.72; }
 
-.skills-pin { max-width: min(54rem, 62vw); }
-.skills-meter { gap: .2rem clamp(1rem, 2vw, 2rem); border-bottom-color: var(--hairline); }
-.skills-meter button { font: .68rem var(--font-outlier); letter-spacing: .04em; }
-.skill-panel { min-height: 20rem; align-content: center; gap: 1.25rem; }
-.layer-icon { width: 68px; height: 68px; }
-.skill-title { font-size: clamp(3.2rem, 6.5vw, 6.5rem); letter-spacing: -.085em; }
-.skill-role { max-width: 38ch; font-size: 1.1rem; }
-.tech-cards { display: flex; flex-wrap: wrap; gap: .65rem; }
+/* Compétences : panneau unique, gestes légers, pas d'effet gadget. */
+.skills-pin { max-width: min(52rem, 58vw); gap: 1.6rem; }
+.skills-pin > .editorial-kicker { margin-bottom: -.7rem; }
+.skills-meter {
+  gap: .25rem clamp(1rem, 2vw, 2rem);
+  border-bottom-color: var(--hairline);
+}
+.skills-meter button {
+  font: .64rem var(--font-outlier);
+  letter-spacing: .025em;
+}
+.skill-panel {
+  min-height: 21rem;
+  align-content: center;
+  gap: 1.15rem;
+}
+.layer-icon { width: 64px; height: 64px; }
+.skill-title {
+  font-size: clamp(3.2rem, 6vw, 6rem);
+  letter-spacing: -.08em;
+}
+.skill-role { max-width: 38ch; font-size: 1.08rem; }
+.tech-cards { gap: .65rem; }
 .tech-card {
-  min-height: 48px;
+  min-height: 50px;
   padding: .7rem 1rem;
-  border: 1px solid var(--hairline);
   border-radius: 2px;
-  background: color-mix(in oklab, var(--color-paper) 86%, var(--color-paper-3));
-  box-shadow: 0 8px 24px color-mix(in oklab, var(--color-ink) 5%, transparent);
-  font-size: .84rem;
+  background: color-mix(in oklab, var(--color-paper) 84%, var(--color-paper-3));
+  box-shadow: 0 8px 22px color-mix(in oklab, var(--color-ink) 5%, transparent);
+  font-size: .83rem;
 }
-.tools { padding-top: 1rem; border-top: 1px solid var(--hairline); line-height: 1.8; }
+.tools {
+  padding-top: 1rem;
+  border-top: 1px solid var(--hairline);
+  line-height: 1.8;
+  font-size: .88rem;
+}
 
+/* Projets : galerie calme ; le livre 3D reste la pièce maîtresse sur desktop. */
 .projects-head {
   align-items: end;
-  padding-bottom: 1.6rem;
+  padding-bottom: 1.4rem;
   border-bottom: 1px solid var(--hairline);
 }
-.projects-head h2 { max-width: 11ch; }
-.projects-count { font: .75rem var(--font-outlier); letter-spacing: .1em; }
-.gallery-shot { border-radius: 0; background: var(--color-paper-3); }
-.gallery-shot img {
-  filter: saturate(.82);
-  transition: transform 1s var(--ease-out), filter 1s var(--ease-out);
+.projects-heading-copy { display: grid; gap: .65rem; }
+.projects-heading-copy .editorial-kicker { margin: 0; }
+.projects-heading-copy h2 { margin: 0; }
+.projects-count {
+  font: .7rem var(--font-outlier);
+  letter-spacing: .1em;
 }
-.gallery-item:hover .gallery-shot img { transform: scale(1.035); filter: saturate(1); }
-.gallery-info { gap: .8rem; }
-.gallery-info h3 { font-size: clamp(1.8rem, 3.2vw, 3.2rem); letter-spacing: -.065em; }
+.gallery-viewport { scrollbar-color: var(--gold-leaf) transparent; }
+.gallery-item { gap: 1.1rem; }
+.gallery-shot {
+  border: 0;
+  border-radius: 0;
+  background: var(--color-paper-3);
+}
+.gallery-shot img {
+  filter: saturate(.86);
+  transition: transform .9s var(--ease-out), filter .9s var(--ease-out);
+}
+.gallery-item:hover .gallery-shot img {
+  transform: scale(1.025);
+  filter: saturate(1);
+}
+.gallery-info { gap: .75rem; }
+.gallery-info h3 {
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  letter-spacing: -.06em;
+}
 .project-context {
   color: var(--gold-leaf);
-  font: .65rem var(--font-outlier);
+  font: .62rem var(--font-outlier);
   letter-spacing: .08em;
   text-transform: uppercase;
 }
 .gallery-desc { max-width: 52ch; line-height: 1.7; }
-.chip { border-radius: 2px; border-color: var(--hairline); font-size: .7rem; }
+.chip {
+  border-radius: 2px;
+  border-color: var(--hairline);
+  font-size: .68rem;
+}
 .book-turn { min-height: 50px; border-radius: 2px; }
 .projects.is-book .projects-pin {
   grid-template-columns: minmax(0, 38%) minmax(0, 1fr);
   column-gap: clamp(2rem, 4vw, 4.5rem);
 }
+.projects.is-book .projects-head { align-items: start; }
 .projects.is-book .book-surface {
-  filter: drop-shadow(0 28px 42px color-mix(in oklab, var(--color-ink) 17%, transparent));
+  filter: drop-shadow(0 26px 38px color-mix(in oklab, var(--color-ink) 16%, transparent));
 }
 .projects.is-book .book-hint {
-  font: .62rem var(--font-outlier);
-  letter-spacing: .1em;
+  font: .59rem var(--font-outlier);
+  letter-spacing: .08em;
   text-transform: uppercase;
 }
 
+/* Contact : changement de registre assumé, bleu nuit et détails laiton. */
 .contact > .panel {
   max-width: min(58rem, 66vw);
-  padding-top: clamp(7rem, 13vw, 12rem);
+  padding-top: clamp(7rem, 12vw, 11rem);
 }
+.contact > .panel > .editorial-kicker { margin-bottom: -.5rem; }
 .contact h2 {
   max-width: 9ch;
-  font-size: clamp(3.3rem, 7vw, 7.2rem);
+  font-size: clamp(3.2rem, 6.5vw, 6.8rem);
   letter-spacing: -.085em;
 }
-.contact .section-lead { color: var(--color-band-muted); line-height: 1.7; }
-.contact-form { gap: 1.3rem; }
-.field input, .field select, .field textarea {
+.contact .section-lead { line-height: 1.7; }
+.contact-form { gap: 1.25rem; }
+.field input,
+.field select,
+.field textarea {
   border-radius: 2px;
   background: color-mix(in oklab, var(--color-band) 90%, white);
   border-color: color-mix(in oklab, var(--color-band-ink) 18%, transparent);
 }
 .field label {
-  color: var(--color-band-muted);
-  font: .66rem var(--font-outlier);
-  letter-spacing: .09em;
+  font: .64rem var(--font-outlier);
+  letter-spacing: .08em;
   text-transform: uppercase;
 }
 .contact-list { border-top-color: color-mix(in oklab, var(--color-band-ink) 20%, transparent); }
 .contact-list li { border-bottom-color: color-mix(in oklab, var(--color-band-ink) 20%, transparent); }
 .contact-list a { text-decoration-color: var(--gold-leaf); }
-.site-footer { font-size: .78rem; letter-spacing: .025em; }
+.site-footer { font-size: .76rem; letter-spacing: .02em; }
 .site-footer a { text-decoration-color: var(--gold-leaf); }
 
+/* Petits écrans : le récit reste fluide, la tour garde sa place et rien ne déborde. */
 @media (max-width: 60rem) {
   .header-inner { height: 64px; }
   .chapter > .panel { padding-block: 5.5rem; }
-  .chapter:not(.hero)::before { top: 2rem; }
-  .hero > .panel { min-height: 0; padding-top: 3.5rem; padding-bottom: 2rem; }
+  .chapter:not(.hero)::before { top: 1.8rem; }
+  .hero > .panel {
+    min-height: 0;
+    padding-top: 3.2rem;
+    padding-bottom: 2.5rem;
+  }
   .hero-copy { max-width: 100%; }
-  .hero h1 { font-size: clamp(4rem, 14vw, 7rem); }
+  .hero h1 { font-size: clamp(4rem, 13vw, 7rem); }
+  .hero-still {
+    position: relative;
+    inset: auto;
+    width: min(100%, 30rem);
+    margin: 0 auto 1rem;
+  }
   .hero-index { right: var(--gutter); bottom: 1rem; }
-  .hero-still { position: relative; right: auto; width: min(100%, 31rem); margin: 0 auto 1rem; }
   .about-grid { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
   .portrait { max-width: min(23rem, 84%); }
   .about-copy h2 { max-width: 12ch; }
-  .timeline-ch .panel, .skills-pin, .contact > .panel { max-width: none; }
-  .skills-pin { gap: 1.4rem; }
-  .skill-panel { min-height: 0; padding-block: 2rem; }
-  .skill-title { font-size: clamp(3rem, 12vw, 5rem); }
+  .timeline-ch .panel,
+  .skills-pin,
+  .contact > .panel { max-width: none; }
+  .skills-pin { gap: 1.35rem; }
+  .skill-panel { min-height: 0; padding-block: 1.5rem; }
+  .skill-title { font-size: clamp(3rem, 11vw, 5rem); }
   .projects-head { align-items: start; }
+  .projects-heading-copy { max-width: 85%; }
   .contact > .panel { padding-top: 6rem; }
-  .contact h2 { font-size: clamp(3.1rem, 12vw, 5.4rem); }
+  .contact h2 { font-size: clamp(3rem, 11vw, 5.2rem); }
 }
 @media (max-width: 40rem) {
-  .chapter > .panel { padding-block: 4.5rem; }
-  .chapter:not(.hero)::before { top: 1.2rem; font-size: .58rem; }
-  .hero h1 { font-size: clamp(3.4rem, 15.5vw, 5rem); }
+  .chapter > .panel { padding-block: 4.6rem; }
+  .chapter:not(.hero)::before { top: 1.25rem; font-size: .56rem; }
+  .hero h1 { font-size: clamp(3.45rem, 15vw, 5.1rem); }
   .hero-kicker { max-width: 28ch; line-height: 1.8; }
-  .hero-role { font-size: 1.08rem; }
-  .hero-actions { gap: 1rem; }
+  .hero-role { font-size: 1.05rem; }
+  .hero-actions { gap: .9rem; }
   .hero-index { display: none; }
-  .about-bio { font-size: 1.05rem; }
+  .about-bio { font-size: 1.03rem; }
   .strip li { width: 82vw; }
-  .tl ol { gap: 3rem; }
-  .tl-step { padding-left: 2rem; }
-  .tl-line, .tl-dot { left: 5px; }
-  .contact-list li { padding-block: 1rem; }
+  .tl-line { left: 5px; }
+  .tl-step {
+    display: block;
+    padding-left: 2rem;
+  }
+  .tl-step[data-side="left"] .tl-card,
+  .tl-step[data-side="right"] .tl-card {
+    text-align: left;
+    justify-items: start;
+  }
+  .tl-dot { left: 5px; }
+  .tl ol { gap: 2.8rem; }
+  .contact-list li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: .35rem;
+    padding-block: .9rem;
+  }
   .site-footer { align-items: start; flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .gallery-shot img { transition: none; }
-}
-
-/* Labels de chapitre : un fil éditorial discret relie les différentes scènes. */
-.editorial-kicker {
-  margin: 0 0 .9rem;
-  color: var(--gold-leaf);
-  font: 500 .64rem/1.6 var(--font-outlier);
-  letter-spacing: .13em;
-  text-transform: uppercase;
-}
-.projects-heading-copy { display: grid; gap: .65rem; }
-.projects-heading-copy .editorial-kicker { margin: 0; }
-.projects-heading-copy h2 { margin: 0; }
-.skills-pin > .editorial-kicker { margin-bottom: -.65rem; }
-.contact > .panel > .editorial-kicker { margin-bottom: -.5rem; }
-@media (max-width: 60rem) {
-  .projects-heading-copy { max-width: 85%; }
 }
