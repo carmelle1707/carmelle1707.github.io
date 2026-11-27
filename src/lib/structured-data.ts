@@ -2,6 +2,7 @@ import type { SiteContent } from "@/lib/content-types";
 import { stripEmphasis } from "@/lib/rich-title";
 import { PORTRAIT } from "@/lib/portrait";
 import { PRESENTATION_VIDEO } from "@/lib/video";
+import { V2_URL } from "@/lib/v2";
 
 /**
  * Données structurées schema.org (JSON-LD) : la personne et son activité de prestataire.
@@ -10,7 +11,8 @@ import { PRESENTATION_VIDEO } from "@/lib/video";
 export function structuredData(c: SiteContent, url: string) {
   const absolute = (path: string | undefined) =>
     path ? new URL(path, `${url}/`).toString() : undefined;
-  const sameAs = [c.contact.linkedin, c.contact.github].filter(Boolean);
+  // La V2 en 3D est le même portfolio sous une autre forme : Google relie les deux.
+  const sameAs = [c.contact.linkedin, c.contact.github, V2_URL].filter(Boolean);
   const personId = `${url}/#personne`;
   const telephone = c.contact.whatsapp.replace(/[^\d+]/g, "") || undefined;
 

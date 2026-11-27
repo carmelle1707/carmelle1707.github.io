@@ -11,6 +11,7 @@ const SECRET_KEYS = [
   "RESEND_API_KEY",
   "RATE_LIMIT_SALT",
   "GOOGLE_SITE_VERIFICATION",
+  "V2_DEPLOY_HOOK_URL",
 ];
 
 describe(".env.example", () => {
