@@ -456,6 +456,136 @@ function Labels({ day, started, reduced }: { day: ScenePalette; started: boolean
   );
 }
 
+
+/**
+ * Double hélice : une structure en ADN qui se construit au rythme du chapitre Parcours.
+ * Les deux brins et les barreaux apparaissent progressivement, du socle vers le sommet.
+ */
+function DnaHelix({ reduced }: { reduced: boolean }) {
+  const root = useRef<THREE.Group>(null);
+  const strandA = useMemo(() => new THREE.BufferGeometry(), []);
+  const strandB = useMemo(() => new THREE.BufferGeometry(), []);
+  const rungs = useMemo(() => new THREE.BufferGeometry(), []);
+  const strandMaterialA = useMemo(() => new THREE.LineBasicMaterial({ color: "#d2a44a", transparent: true, opacity: 0.92 }), []);
+  const strandMaterialB = useMemo(() => new THREE.LineBasicMaterial({ color: "#8fb3e0", transparent: true, opacity: 0.9 }), []);
+  const rungMaterial = useMemo(() => new THREE.LineBasicMaterial({ color: "#c7d2e3", transparent: true, opacity: 0.62 }), []);
+  const points = useMemo(() => {
+    const a: number[] = [];
+    const b: number[] = [];
+    const r: number[] = [];
+    const turns = 3.25;
+    const height = 4.35;
+    const radius = 0.34;
+    const segments = 240;
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments;
+      const angle = t * Math.PI * 2 * turns;
+      const y = t * height;
+      a.push(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+      b.push(Math.cos(angle + Math.PI) * radius, y, Math.sin(angle + Math.PI) * radius);
+      if (i % 8 === 0) {
+        r.push(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+        r.push(Math.cos(angle + Math.PI) * radius, y, Math.sin(angle + Math.PI) * radius);
+      }
+    }
+    return { a: new Float32Array(a), b: new Float32Array(b), r: new Float32Array(r), segments, rungs: r.length / 6 };
+  }, []);
+  useEffect(() => {
+    strandA.setAttribute("position", new THREE.BufferAttribute(points.a, 3));
+    strandB.setAttribute("position", new THREE.BufferAttribute(points.b, 3));
+    rungs.setAttribute("position", new THREE.BufferAttribute(points.r, 3));
+    strandA.setDrawRange(0, 0);
+    strandB.setDrawRange(0, 0);
+    rungs.setDrawRange(0, 0);
+    return () => {
+      strandA.dispose(); strandB.dispose(); rungs.dispose();
+      strandMaterialA.dispose(); strandMaterialB.dispose(); rungMaterial.dispose();
+    };
+  }, [strandA, strandB, rungs, points, strandMaterialA, strandMaterialB, rungMaterial]);
+  useFrame((state, delta) => {
+    const active = scroll.page === "home" && scroll.active === "parcours";
+    const progress = active ? clamp01((scroll.local.parcours - 0.08) / 0.78) : 0;
+    const visible = active || progress > 0.001;
+    if (root.current) {
+      root.current.visible = visible;
+      const target = active ? 1 : 0;
+      root.current.position.y = THREE.MathUtils.damp(root.current.position.y, active ? 0.05 : -0.45, reduced ? 1000 : 3, delta);
+      root.current.rotation.y = reduced ? 0 : Math.sin(state.clock.elapsedTime * 0.22) * 0.08;
+      const amount = Math.max(progress, active ? 0.015 : 0);
+      const vertices = Math.floor(amount * (points.segments + 1));
+      strandA.setDrawRange(0, vertices);
+      strandB.setDrawRange(0, vertices);
+      rungs.setDrawRange(0, Math.floor(amount * points.rungs) * 2);
+      const fade = active ? 0.96 : 0;
+      strandMaterialA.opacity = THREE.MathUtils.damp(strandMaterialA.opacity, fade, reduced ? 1000 : 4, delta);
+      strandMaterialB.opacity = THREE.MathUtils.damp(strandMaterialB.opacity, fade * 0.92, reduced ? 1000 : 4, delta);
+      rungMaterial.opacity = THREE.MathUtils.damp(rungMaterial.opacity, fade * 0.62, reduced ? 1000 : 4, delta);
+    }
+  });
+  return (
+    <group ref={root} position={[-2.65, 0.05, 0.2]} visible={false}>
+      <line geometry={strandA} material={strandMaterialA} />
+      <line geometry={strandB} material={strandMaterialB} />
+      <lineSegments geometry={rungs} material={rungMaterial} />
+      <mesh position={[0, 0, 0]}>
+        <cylinderGeometry args={[0.48, 0.48, 0.045, 48]} />
+        <meshStandardMaterial color="#1a2539" metalness={0.55} roughness={0.38} />
+      </mesh>
+      <mesh position={[0, 0.035, 0]}>
+        <torusGeometry args={[0.43, 0.012, 8, 64]} />
+        <meshStandardMaterial color="#d2a44a" metalness={0.72} roughness={0.28} emissive="#8c6424" emissiveIntensity={0.18} />
+      </mesh>
+      <mesh position={[0, 4.38, 0]}>
+        <sphereGeometry args={[0.055, 16, 16]} />
+        <meshStandardMaterial color="#e0b665" emissive="#d2a44a" emissiveIntensity={0.55} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Petits artefacts orbitaux : la couche sélectionnée révèle ses technologies comme une constellation. */
+function SkillConstellation({ reduced }: { reduced: boolean }) {
+  const group = useRef<THREE.Group>(null);
+  const layer = useStage((s) => s.layer);
+  const section = useStage((s) => s.section);
+  const active = LAYERS.find((item) => item.id === layer);
+  const nodes = useMemo(() => Array.from({ length: 7 }, (_, i) => ({
+    angle: (i / 7) * Math.PI * 2,
+    radius: 1.22 + (i % 2) * 0.22,
+    y: Math.sin(i * 1.7) * 0.48,
+    size: i % 3 === 0 ? 0.105 : 0.07,
+  })), []);
+  useFrame((state, delta) => {
+    if (!group.current) return;
+    const shown = section === "competences" && scroll.page === "home";
+    group.current.visible = shown;
+    if (shown && !reduced) {
+      group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, state.clock.elapsedTime * 0.12, 2.4, delta);
+      group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, Math.sin(state.clock.elapsedTime * 0.24) * 0.08, 2.4, delta);
+    }
+  });
+  return (
+    <group ref={group} position={[0, slabY(LAYERS.length - 1, 1) + 0.3, 0]}>
+      {nodes.map((node, i) => (
+        <group key={i} position={[Math.cos(node.angle) * node.radius, node.y, Math.sin(node.angle) * node.radius]}>
+          <mesh>
+            <icosahedronGeometry args={[node.size, 1]} />
+            <meshStandardMaterial color={i % 2 ? "#8fb3e0" : "#d2a44a"} metalness={0.58} roughness={0.3} emissive={i % 2 ? "#29466b" : "#73501c"} emissiveIntensity={0.22} />
+          </mesh>
+          <mesh scale={1.65}>
+            <sphereGeometry args={[node.size, 12, 12]} />
+            <meshBasicMaterial color={i % 2 ? "#8fb3e0" : "#d2a44a"} transparent opacity={0.08} />
+          </mesh>
+        </group>
+      ))}
+      <mesh>
+        <torusGeometry args={[1.55, 0.008, 6, 96]} />
+        <meshBasicMaterial color="#8fb3e0" transparent opacity={0.45} />
+      </mesh>
+    </group>
+  );
+}
+
 export function Tower({ day, night, reduced, wide, started }: Props) {
   // En mouvement réduit, la tour est déjà assemblée : pas d'attente.
   const ready = started || reduced;
@@ -493,6 +623,8 @@ export function Tower({ day, night, reduced, wide, started }: Props) {
           <Slab key={l.id} index={i} day={day} night={night} reduced={reduced} started={ready} />
         ))}
         <Book reduced={reduced} wide={wide} top={bookTop} />
+        <DnaHelix reduced={reduced} />
+        <SkillConstellation reduced={reduced} />
         <Flow day={day} reduced={reduced} started={ready} />
         {wide && <Labels day={day} started={ready} reduced={reduced} />}
       </Spin>
