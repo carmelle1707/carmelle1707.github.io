@@ -461,7 +461,7 @@ function Labels({ day, started, reduced }: { day: ScenePalette; started: boolean
  * Double hélice : une structure en ADN qui se construit au rythme du chapitre Parcours.
  * Les deux brins et les barreaux apparaissent progressivement, du socle vers le sommet.
  */
-function DnaHelix({ reduced }: { reduced: boolean }) {
+function DnaHelix({ reduced, wide }: { reduced: boolean; wide: boolean }) {
   const root = useRef<THREE.Group>(null);
   const strandA = useMemo(() => new THREE.BufferGeometry(), []);
   const strandB = useMemo(() => new THREE.BufferGeometry(), []);
@@ -508,7 +508,6 @@ function DnaHelix({ reduced }: { reduced: boolean }) {
     const visible = active || progress > 0.001;
     if (root.current) {
       root.current.visible = visible;
-      const target = active ? 1 : 0;
       root.current.position.y = THREE.MathUtils.damp(root.current.position.y, active ? 0.05 : -0.45, reduced ? 1000 : 3, delta);
       root.current.rotation.y = reduced ? 0 : Math.sin(state.clock.elapsedTime * 0.22) * 0.08;
       const amount = Math.max(progress, active ? 0.015 : 0);
@@ -523,7 +522,7 @@ function DnaHelix({ reduced }: { reduced: boolean }) {
     }
   });
   return (
-    <group ref={root} position={[-2.65, 0.05, 0.2]} visible={false}>
+    <group ref={root} position={wide ? [-2.65, 0.05, 0.2] : [-1.35, 0.05, 0.2]} scale={wide ? 1 : 0.82} visible={false}>
       <line geometry={strandA} material={strandMaterialA} />
       <line geometry={strandB} material={strandMaterialB} />
       <lineSegments geometry={rungs} material={rungMaterial} />
@@ -546,9 +545,7 @@ function DnaHelix({ reduced }: { reduced: boolean }) {
 /** Petits artefacts orbitaux : la couche sélectionnée révèle ses technologies comme une constellation. */
 function SkillConstellation({ reduced }: { reduced: boolean }) {
   const group = useRef<THREE.Group>(null);
-  const layer = useStage((s) => s.layer);
   const section = useStage((s) => s.section);
-  const active = LAYERS.find((item) => item.id === layer);
   const nodes = useMemo(() => Array.from({ length: 7 }, (_, i) => ({
     angle: (i / 7) * Math.PI * 2,
     radius: 1.22 + (i % 2) * 0.22,
@@ -623,7 +620,7 @@ export function Tower({ day, night, reduced, wide, started }: Props) {
           <Slab key={l.id} index={i} day={day} night={night} reduced={reduced} started={ready} />
         ))}
         <Book reduced={reduced} wide={wide} top={bookTop} />
-        <DnaHelix reduced={reduced} />
+        <DnaHelix reduced={reduced} wide={wide} />
         <SkillConstellation reduced={reduced} />
         <Flow day={day} reduced={reduced} started={ready} />
         {wide && <Labels day={day} started={ready} reduced={reduced} />}
