@@ -7,7 +7,6 @@
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./base.css";
-@import "./editorial.css";
 
 /* La page s'efface derrière l'écran de démarrage tant que React n'a pas pris la main. */
 html[data-boot="1"]::before {

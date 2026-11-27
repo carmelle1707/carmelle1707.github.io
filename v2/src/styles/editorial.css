@@ -449,3 +449,40 @@ body { letter-spacing: -0.012em; }
   html { scroll-behavior: auto; }
   .gallery-shot img { transition: none; }
 }
+
+
+/* Accessibilité : le focus reste visible même sur les fonds très contrastés. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--gold-leaf);
+  outline-offset: 4px;
+}
+.site-nav a:focus-visible,
+.wordmark:focus-visible {
+  border-radius: 1px;
+}
+
+/* Respect strict de la préférence système : aucune animation décorative persistante. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .scroll-cue-line {
+    animation: none !important;
+    transform: scaleX(1);
+  }
+  .btn-primary:hover,
+  .gallery-item:hover .gallery-shot img {
+    transform: none;
+  }
+}
+
+/* Navigateurs sans flou : le contraste du menu reste assuré. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header { background: var(--color-paper); }
+}
