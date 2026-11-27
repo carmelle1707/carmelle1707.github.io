@@ -97,6 +97,7 @@ export function Timeline() {
 
   return (
     <Chapter ref={ref} id="parcours" className="timeline-ch" labelledBy="steps-title" window="end">
+      <p className="editorial-kicker">Les étapes qui m’ont construite</p>
       <h2 id="steps-title">Le parcours, de bas en haut</h2>
       <div className="tl">
         <div className="tl-line" aria-hidden="true">

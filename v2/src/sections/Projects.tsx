@@ -294,7 +294,10 @@ export function Projects() {
     <Chapter ref={ref} id="projets" className="projects" labelledBy="projects-title" window="start">
       <div className="projects-pin" onKeyDown={onKey}>
         <div className="projects-head">
-          <h2 id="projects-title">Chaque projet a sa propre pile</h2>
+          <div className="projects-heading-copy">
+            <p className="editorial-kicker">Sélection de réalisations</p>
+            <h2 id="projects-title">Chaque projet a sa propre pile</h2>
+          </div>
           <p className="projects-count" aria-hidden="true">
             <span className="num">{pad(index + 1)}</span> / <span className="num">{pad(n)}</span>
           </p>

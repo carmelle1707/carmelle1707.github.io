@@ -37,6 +37,7 @@ export function Contact() {
 
   return (
     <Chapter ref={ref} id="contact" className="contact" labelledBy="contact-title" window="start">
+      <p className="editorial-kicker">Et si nous construisions quelque chose ?</p>
       <h2 id="contact-title">
         <Words text={"Un projet en tête\u00a0? Écrivez-moi."} mask />
       </h2>

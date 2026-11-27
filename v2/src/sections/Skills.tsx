@@ -119,6 +119,7 @@ export function Skills() {
   return (
     <Chapter ref={ref} id="competences" className="skills" labelledBy="skills-title" window="start">
       <div className="skills-pin">
+        <p className="editorial-kicker">Une expertise en construction</p>
         <h2 id="skills-title">Ma pile, couche par couche</h2>
         <ol className="skills-meter" aria-label="Couches de la pile">
           {ORDER.map((l, i) => (

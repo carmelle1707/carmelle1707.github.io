@@ -334,3 +334,20 @@ body { letter-spacing: -0.012em; }
   html { scroll-behavior: auto; }
   .gallery-shot img { transition: none; }
 }
+
+/* Labels de chapitre : un fil éditorial discret relie les différentes scènes. */
+.editorial-kicker {
+  margin: 0 0 .9rem;
+  color: var(--gold-leaf);
+  font: 500 .64rem/1.6 var(--font-outlier);
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.projects-heading-copy { display: grid; gap: .65rem; }
+.projects-heading-copy .editorial-kicker { margin: 0; }
+.projects-heading-copy h2 { margin: 0; }
+.skills-pin > .editorial-kicker { margin-bottom: -.65rem; }
+.contact > .panel > .editorial-kicker { margin-bottom: -.5rem; }
+@media (max-width: 60rem) {
+  .projects-heading-copy { max-width: 85%; }
+}
