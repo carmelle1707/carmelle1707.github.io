@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { CONTACT_API } from "../content/site";
+import { setStage } from "../state/store";
 
 /** Les mêmes choix que le formulaire du site Next.js : l'API les valide de la même façon. */
 const PROJECT_TYPES = [
@@ -40,6 +41,7 @@ export function ContactForm() {
       if (data.status === "success") {
         form.reset();
         setState({ status: "success" });
+        setStage({ celebrate: Date.now() });
       } else if (data.status === "error") {
         setState({ status: "error", message: data.message, fieldErrors: data.fieldErrors ?? {} });
         const first = Object.keys(data.fieldErrors ?? {})[0];

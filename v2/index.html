@@ -14,12 +14,30 @@
       href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700&family=Figtree:wght@400;700&family=JetBrains+Mono:wght@400&display=swap"
     />
     <script>
-      // Écran de démarrage CARMELLE.EXE : une fois par session, jamais si l'on a demandé moins d'animations.
-      try {
-        if (location.pathname === "/" && !matchMedia("(prefers-reduced-motion: reduce)").matches && !sessionStorage.getItem("carmelle-boot")) {
-          document.documentElement.dataset.boot = "1";
-        }
-      } catch (e) {}
+      // Avant le premier affichage : de quoi éviter un éclair de contenu animé ou une tour qui disparaît.
+      (function () {
+        var root = document.documentElement;
+        try {
+          var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+          root.classList.add("js");
+          if (!reduce) root.classList.add("motion-ok");
+          // Même décision que src/lib/capabilities.ts : la tour en 3D, ou son image fixe.
+          var gl = document.createElement("canvas");
+          var ok = !/[?&]fixe\b/.test(location.search) && !!(gl.getContext("webgl2") || gl.getContext("webgl"));
+          var conn = navigator.connection;
+          if (ok && !(conn && conn.saveData) && (navigator.hardwareConcurrency || 4) >= 4 && (location.pathname === "/" || location.pathname.indexOf("/projets/") === 0))
+            root.classList.add("scene-3d");
+          // Écran de démarrage CARMELLE.EXE : une fois par session, jamais si l'on a demandé moins d'animations.
+          if (location.pathname === "/" && !reduce && !sessionStorage.getItem("carmelle-boot")) root.dataset.boot = "1";
+        } catch (e) {}
+        // Filet de sécurité : si l'application ne démarre pas, tout le texte s'affiche normalement.
+        setTimeout(function () {
+          if (!root.dataset.ready) {
+            root.classList.remove("js", "motion-ok");
+            delete root.dataset.boot;
+          }
+        }, 5000);
+      })();
     </script>
   </head>
   <body>

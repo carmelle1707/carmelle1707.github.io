@@ -1,44 +1,17 @@
 import { useEffect, useState, type ComponentType } from "react";
 import { Boot } from "./intro/Boot";
-import { About, Contact, Footer, Header, Hero, Projects, Skills, Steps } from "./sections/Sections";
+import { About, Contact, Footer, Header, Hero, Projects, Skills, Timeline } from "./sections/Sections";
 import { detectSceneMode, useReducedMotion, useWideScreen, type SceneMode } from "./lib/capabilities";
 import { setStage } from "./state/store";
-import type { SectionId } from "./content/site";
 import { matchRoute } from "./content/routes";
 import { ProjectPage } from "./pages/ProjectPage";
 import { NotFound, VideoPage } from "./pages/VideoPage";
+import { useChapters } from "./motion/chapters";
+import { ScrollTrigger } from "./motion/scroll";
 
 type StageProps = { reduced: boolean; wide: boolean; waiting: boolean; onReady: () => void; onDecline: () => void };
 
 const BOOT_KEY = "carmelle-boot";
-
-/** La section qui occupe le milieu de l'écran pilote la tour. */
-function useActiveSection(enabled: boolean) {
-  useEffect(() => {
-    if (!enabled) return;
-    const sections = document.querySelectorAll<HTMLElement>("[data-section]");
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) setStage({ section: e.target.getAttribute("data-section") as SectionId });
-        }
-      },
-      { rootMargin: "-45% 0px -45% 0px" },
-    );
-    sections.forEach((s) => io.observe(s));
-    return () => io.disconnect();
-  }, [enabled]);
-}
-
-/** Image fixe de la tour : appareils sans WebGL, peu puissants ou en économie de données. */
-function Still() {
-  return (
-    <picture className="tower-still">
-      <source srcSet="/stills/tour-sombre.webp" media="(prefers-color-scheme: dark)" />
-      <img src="/stills/tour.webp" alt="" width={1200} height={1200} decoding="async" />
-    </picture>
-  );
-}
 
 export default function App({ path }: { path: string }) {
   const route = matchRoute(path);
@@ -51,23 +24,30 @@ export default function App({ path }: { path: string }) {
   const [Stage, setStageComponent] = useState<ComponentType<StageProps> | null>(null);
   const [fonts, setFonts] = useState(false);
   const [frame, setFrame] = useState(false);
-  const [boot, setBoot] = useState(false);
+  const [boot, setBoot] = useState<boolean | null>(null);
 
-  useActiveSection(home);
+  useChapters(home);
 
   useEffect(() => {
     const root = document.documentElement;
+    root.dataset.ready = "1";
     // Le script de index.html cache la page derrière l'écran de démarrage : seul l'accueil le garde.
-    if (!tower) {
-      delete root.dataset.boot;
-      return;
-    }
-    const m = detectSceneMode();
+    const m = tower ? detectSceneMode() : "still";
     setMode(m);
-    if (m === "3d" && home && root.dataset.boot === "1") setBoot(true);
+    if (m !== "3d" && root.classList.contains("scene-3d")) {
+      root.classList.remove("scene-3d");
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+    }
+    const withBoot = m === "3d" && home && root.dataset.boot === "1";
+    setBoot(withBoot);
     delete root.dataset.boot;
     document.fonts.ready.then(() => setFonts(true));
   }, [tower, home]);
+
+  // Sans écran de démarrage (ou une fois parti), les ouvertures peuvent jouer.
+  useEffect(() => {
+    if (boot === false) setStage({ started: true });
+  }, [boot]);
 
   useEffect(() => {
     if (mode !== "3d") return;
@@ -91,16 +71,12 @@ export default function App({ path }: { path: string }) {
     document.querySelector<HTMLElement>("h1")?.focus({ preventScroll: true });
   };
 
-  const scene =
-    mode === "still" ? (
-      <Still />
-    ) : Stage ? (
-      <Stage
-        reduced={reduced}
-        wide={wide}
-        waiting={boot}
-        onReady={() => setFrame(true)} onDecline={() => setMode("still")} />
-    ) : null;
+  const decline = () => {
+    setMode("still");
+    document.documentElement.classList.remove("scene-3d");
+    // Sur téléphone, les fenêtres sur la tour disparaissent : toutes les positions de défilement changent.
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  };
 
   return (
     <>
@@ -109,31 +85,30 @@ export default function App({ path }: { path: string }) {
       </a>
       {boot && <Boot fonts={fonts} scene={Stage !== null} frame={frame} onDone={finishBoot} />}
       <Header home={home} />
-      {tower ? (
-        <div className="layout">
-          <main id="contenu" className="content">
-            {route.kind === "project" ? (
-              <ProjectPage project={route.project} stage={wide ? null : scene} />
-            ) : (
-              <>
-                <Hero stage={wide ? null : scene} />
-                <About />
-                <Skills />
-                <Projects />
-                <Steps />
-                <Contact />
-              </>
-            )}
-          </main>
-          <aside className="stage" aria-hidden="true">
-            <div className="stage-sticky">{wide ? scene : null}</div>
-          </aside>
+      {home && <div className="night" aria-hidden="true" />}
+      {tower && mode === "3d" && Stage && (
+        <div className="scene" aria-hidden="true">
+          <Stage reduced={reduced} wide={wide} waiting={boot !== false} onReady={() => setFrame(true)} onDecline={decline} />
         </div>
-      ) : (
-        <main id="contenu" className="single">
-          {route.kind === "video" ? <VideoPage /> : <NotFound />}
-        </main>
       )}
+      <main id="contenu" className={home ? "chapters" : tower ? "project-main" : "single"}>
+        {route.kind === "project" ? (
+          <ProjectPage project={route.project} />
+        ) : home ? (
+          <>
+            <Hero />
+            <About />
+            <Timeline />
+            <Skills />
+            <Projects />
+            <Contact />
+          </>
+        ) : route.kind === "video" ? (
+          <VideoPage />
+        ) : (
+          <NotFound />
+        )}
+      </main>
       <Footer />
     </>
   );

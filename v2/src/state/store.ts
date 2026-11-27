@@ -2,30 +2,28 @@ import { useSyncExternalStore } from "react";
 import { PROJECTS, type LayerId, type SectionId } from "../content/site";
 
 /**
- * État partagé entre les sections HTML et la scène 3D : la section lue,
- * la couche survolée, le projet ouvert et l'étape survolée.
- * Un petit store maison suffit : pas besoin d'une bibliothèque pour quatre valeurs.
+ * État partagé entre les sections HTML et la scène 3D : le chapitre lu, la couche
+ * mise en avant, le projet visible, l'étape atteinte et le dernier message envoyé.
+ * Un petit store maison suffit : pas besoin d'une bibliothèque pour cinq valeurs.
  */
 export type StageState = {
   section: SectionId;
   layer: LayerId | null;
   project: string;
   step: number | null;
+  /** Horodatage du dernier envoi réussi : la tour s'illumine. */
+  celebrate: number;
+  /** Vrai une fois l'écran de démarrage parti (ou sans écran de démarrage) : les introductions peuvent jouer. */
+  started: boolean;
 };
 
-let state: StageState = { section: "accueil", layer: null, project: PROJECTS[0]?.slug ?? "", step: null };
+let state: StageState = { section: "accueil", layer: null, project: PROJECTS[0]?.slug ?? "", step: null, celebrate: 0, started: false };
 const listeners = new Set<() => void>();
 
 export function setStage(patch: Partial<StageState>) {
   const next = { ...state, ...patch };
-  if (
-    next.section === state.section &&
-    next.layer === state.layer &&
-    next.project === state.project &&
-    next.step === state.step
-  ) {
-    return;
-  }
+  const keys = Object.keys(next) as (keyof StageState)[];
+  if (keys.every((k) => next[k] === state[k])) return;
   state = next;
   listeners.forEach((l) => l());
 }

@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import admin from "./admin.json";
-import { LAYERS, NAV, PROFILE, PROJECTS, WECODE_PHOTOS, buildContent, fromMain, layerOf, type AdminContent } from "./site";
+import { CHAPTERS, LAYERS, NAV, PROFILE, PROJECTS, WECODE_PHOTOS, buildContent, fromMain, layerOf, type AdminContent } from "./site";
 import { DESCRIPTION, TITLE, headTags, robots, sitemap, structuredData } from "../seo";
 import { ROUTES, matchRoute } from "./routes";
 
@@ -130,5 +130,13 @@ describe("référencement de la V2", () => {
     for (const p of PROJECTS) expect(xml).toContain(`/projets/${p.slug}</loc>`);
     expect(xml).not.toContain("/video</loc>");
     expect(robots()).toContain("Sitemap: https://ange-carmelle-gbedji-3d.vercel.app/sitemap.xml");
+  });
+});
+
+describe("chapitres de l'accueil", () => {
+  it("chaque entrée du menu mène à un chapitre, et l'accueil ouvre la page", () => {
+    expect(new Set(CHAPTERS).size).toBe(CHAPTERS.length);
+    expect(CHAPTERS[0]).toBe("accueil");
+    for (const n of NAV) expect(CHAPTERS).toContain(n.id);
   });
 });

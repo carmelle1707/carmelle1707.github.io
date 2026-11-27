@@ -1,46 +1,72 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Edges, Html, Line, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 import gsap from "gsap";
-import { LAYERS, PROJECTS, STEPS } from "../content/site";
-import { getStage, setStage, useStage, type StageState } from "../state/store";
-import { POSES, SLAB, slabY, type Pose } from "./poses";
+import { CHAPTERS, LAYERS, PROJECTS, type SectionId } from "../content/site";
+import { getStage, useStage } from "../state/store";
+import { pointer, scroll } from "../motion/scroll";
+import { SLAB, introPose, mix, poseFor, projectPagePose, slabY, type Pose } from "./poses";
 import type { ScenePalette } from "./palette";
-
-const ACCUEIL: StageState = { section: "accueil", layer: null, project: "", step: null };
-const NARROW_POSE: Pose = { camera: [6.5, 4.8, 7.4], target: [0, 1.1, 0], spread: 0 };
 
 /** Paquets de données qui remontent la colonne : leur hauteur, lue par les plaques qu'ils traversent. */
 const PACKETS = 3;
 const packetY: number[] = Array(PACKETS).fill(-10);
 
+/** Valeurs vivantes partagées par les éléments de la scène, mises à jour à chaque image par la caméra. */
+const live = { spread: 0, night: 0 };
+
 type Props = {
-  palette: ScenePalette;
+  day: ScenePalette;
+  night: ScenePalette;
   reduced: boolean;
-  labels: boolean;
-  interactive: boolean;
+  wide: boolean;
   /** Vrai une fois l'écran de démarrage parti : la tour peut s'assembler. */
   started: boolean;
 };
 
-type Place = { x: number; y: number; z: number; lit: boolean; gold: boolean };
+type Place = { x: number; y: number; z: number; alpha: number; gold: boolean };
 
-/** Où se tient chaque plaque, et comment elle est mise en avant, selon la section lue. */
-function place(i: number, s: StageState): Place {
-  const spread = POSES[s.section].spread;
-  let y = slabY(i, spread);
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+
+/** Le chapitre lu et l'avancée dedans ; sur la page d'un projet, la tour reste sur « projets ». */
+function reading(): { id: SectionId; t: number } {
+  if (scroll.page === "project") return { id: "projets", t: 0 };
+  return { id: scroll.active, t: scroll.local[scroll.active] };
+}
+
+/** Nombre de plaques posées pendant le parcours : la tour se reconstruit au fil des années. */
+const builtAt = (t: number) => Math.min(LAYERS.length, Math.max(0, Math.floor(((t - 0.18) / 0.62) * (LAYERS.length + 1))));
+
+/** Index de la couche ouverte dans les compétences (la couche du haut par défaut). */
+function layerIndex() {
+  const i = LAYERS.findIndex((l) => l.id === getStage().layer);
+  return i < 0 ? LAYERS.length - 1 : i;
+}
+
+/** Où se tient chaque plaque, et comment elle est mise en avant, selon le chapitre lu. */
+function place(i: number): Place {
+  const { id, t } = reading();
+  const s = getStage();
+  let y = slabY(i, live.spread);
   let x = 0;
   let z = 0;
-  let lit = true;
+  let alpha = 1;
   let gold = false;
-  switch (s.section) {
-    case "parcours":
-      gold = i === 0;
+  switch (id) {
+    case "parcours": {
+      const built = builtAt(t);
+      if (i >= built) {
+        // Pas encore posée : elle attend au-dessus, pâle, et descend quand son année arrive.
+        y += 3.2 + (i - built) * 0.55;
+        alpha = 0.1;
+      }
+      gold = i === built - 1;
       break;
+    }
     case "competences":
-      gold = s.layer !== null && LAYERS[i].id === s.layer;
-      // La couche choisie sort de la pile comme un tiroir.
+      gold = i === layerIndex();
+      // La couche lue sort de la pile comme un tiroir.
       if (gold) z = 0.75;
       break;
     case "projets": {
@@ -50,27 +76,24 @@ function place(i: number, s: StageState): Place {
       const used = LAYERS.map((l, k) => ({ id: l.id, k })).filter((o) => project.layers.includes(o.id));
       const rank = used.findIndex((o) => o.k === i);
       if (rank >= 0) {
-        y = slabY(rank, spread);
+        y = slabY(rank, live.spread);
         gold = true;
       } else {
-        lit = false;
+        alpha = 0;
         x = -(SLAB.width + 0.9);
       }
       break;
     }
-    case "etapes":
-      gold = s.step === i;
-      break;
   }
-  return { x, y, z, lit, gold };
+  return { x, y, z, alpha, gold };
 }
 
 /** Haut de la pile visible : la colonne de flux s'arrête là. */
-function stackTop(s: StageState) {
+function stackTop() {
   let top = 0;
   LAYERS.forEach((_, i) => {
-    const p = place(i, s);
-    if (p.lit) top = Math.max(top, p.y);
+    const p = place(i);
+    if (p.alpha > 0.5) top = Math.max(top, p.y);
   });
   return top + 0.5;
 }
@@ -85,152 +108,156 @@ function approach(obj: { v: number }, target: number, lambda: number, delta: num
   return true;
 }
 
+/** La pose voulue à cet instant : celle du chapitre, fondue avec la précédente en début de chapitre. */
+function targetPose(wide: boolean, height: number): Pose {
+  let pose: Pose;
+  if (scroll.page === "project") pose = projectPagePose(wide);
+  else {
+    const id = scroll.active;
+    const k = CHAPTERS.indexOf(id);
+    const t = id === "competences" ? (LAYERS.length - 1 - layerIndex()) / (LAYERS.length - 1) : scroll.local[id];
+    pose = poseFor(id, t, wide);
+    if (k > 0) {
+      const blend = clamp01(scroll.px[id] / (height * 0.6));
+      if (blend < 1) pose = mix(poseFor(CHAPTERS[k - 1], 1, wide), pose, blend);
+    }
+  }
+  return scroll.intro < 1 ? mix(introPose(wide), pose, scroll.intro) : pose;
+}
+
+/**
+ * La caméra suit le récit : chaque chapitre a sa pose, et `setViewOffset` place la tour
+ * à droite, à gauche ou en haut de l'écran sans déplacer la scène.
+ */
 function CameraRig({ reduced, wide }: { reduced: boolean; wide: boolean }) {
-  const camera = useThree((s) => s.camera);
+  const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
+  const size = useThree((s) => s.size);
   const invalidate = useThree((s) => s.invalidate);
-  const look = useRef(new THREE.Vector3(...POSES.accueil.target));
+  const start = targetPose(wide, size.height);
+  const look = useRef(new THREE.Vector3(...start.target));
+  const shift = useRef({ x: start.shift[0], y: start.shift[1] });
   const goalPos = useMemo(() => new THREE.Vector3(), []);
   const goalLook = useMemo(() => new THREE.Vector3(), []);
 
   useFrame((_, delta) => {
-    // Sur mobile, la tour ne vit que dans l'accueil : vue d'ensemble fixe, centrée.
-    const pose = wide ? POSES[getStage().section] : NARROW_POSE;
+    const pose = targetPose(wide, size.height);
     goalPos.set(...pose.camera);
     goalLook.set(...pose.target);
-    const lambda = reduced ? 1000 : 2.4;
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, goalPos.x, lambda, delta);
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, goalPos.y, lambda, delta);
-    camera.position.z = THREE.MathUtils.damp(camera.position.z, goalPos.z, lambda, delta);
-    look.current.lerp(goalLook, 1 - Math.exp(-lambda * delta));
+    const lambda = reduced ? 1000 : 3.4;
+    const k = 1 - Math.exp(-lambda * delta);
+    camera.position.lerp(goalPos, k);
+    look.current.lerp(goalLook, k);
     camera.lookAt(look.current);
-    if (camera.position.distanceTo(goalPos) > 0.002 || look.current.distanceTo(goalLook) > 0.002) invalidate();
+    shift.current.x = THREE.MathUtils.damp(shift.current.x, pose.shift[0], lambda, delta);
+    shift.current.y = THREE.MathUtils.damp(shift.current.y, pose.shift[1], lambda, delta);
+    camera.setViewOffset(
+      size.width,
+      size.height,
+      -shift.current.x * size.width,
+      shift.current.y * size.height,
+      size.width,
+      size.height,
+    );
+    live.spread = THREE.MathUtils.damp(live.spread, pose.spread, lambda, delta);
+    live.night = THREE.MathUtils.damp(live.night, scroll.night, reduced ? 1000 : 6, delta);
+    if (
+      camera.position.distanceTo(goalPos) > 0.002 ||
+      look.current.distanceTo(goalLook) > 0.002 ||
+      Math.abs(live.spread - pose.spread) > 0.001
+    )
+      invalidate();
   });
   return null;
 }
 
-/**
- * La tour pivote doucement sur elle-même, suit le curseur, et se fait tourner à la souris
- * (elle revient ensuite d'elle-même face à la lecture).
- */
-function Spin({ children, reduced, interactive }: { children: ReactNode; reduced: boolean; interactive: boolean }) {
+/** La tour oscille doucement et s'incline vers le curseur ; la lumière principale le suit aussi. */
+function Spin({ children, reduced }: { children: React.ReactNode; reduced: boolean }) {
   const group = useRef<THREE.Group>(null);
-  const el = useThree((s) => s.gl.domElement);
-  const pointer = useRef({ x: 0, y: 0 });
-  const drag = useRef({ active: false, startX: 0, base: 0, yaw: 0, vel: 0, lastX: 0 });
-
-  useEffect(() => {
-    if (reduced) return;
-    const onMove = (e: PointerEvent) => {
-      pointer.current.x = (e.clientX / window.innerWidth) * 2 - 1;
-      pointer.current.y = (e.clientY / window.innerHeight) * 2 - 1;
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    if (!interactive) return () => window.removeEventListener("pointermove", onMove);
-
-    const d = drag.current;
-    const down = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse" || e.button !== 0) return;
-      d.active = true;
-      d.startX = d.lastX = e.clientX;
-      d.base = d.yaw;
-      d.vel = 0;
-      el.setPointerCapture(e.pointerId);
-      el.style.cursor = "grabbing";
-    };
-    const move = (e: PointerEvent) => {
-      if (!d.active) return;
-      d.yaw = d.base + (e.clientX - d.startX) * 0.012;
-      d.vel = (e.clientX - d.lastX) * 0.012;
-      d.lastX = e.clientX;
-    };
-    const up = (e: PointerEvent) => {
-      if (!d.active) return;
-      d.active = false;
-      if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
-      el.style.cursor = "grab";
-    };
-    el.style.cursor = "grab";
-    el.addEventListener("pointerdown", down);
-    el.addEventListener("pointermove", move);
-    el.addEventListener("pointerup", up);
-    el.addEventListener("pointercancel", up);
-    return () => {
-      window.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerdown", down);
-      el.removeEventListener("pointermove", move);
-      el.removeEventListener("pointerup", up);
-      el.removeEventListener("pointercancel", up);
-      el.style.cursor = "";
-    };
-  }, [reduced, interactive, el]);
-
   useFrame((state, delta) => {
     const g = group.current;
     if (!g || reduced) return;
-    const d = drag.current;
-    if (!d.active) {
-      // L'élan du lancer, puis le retour en douceur vers la vue de la section.
-      d.yaw += d.vel;
-      d.vel *= Math.exp(-5 * delta);
-      d.yaw = THREE.MathUtils.damp(d.yaw, 0, 0.9, delta);
-    }
     const idle = Math.sin(state.clock.elapsedTime * 0.35) * 0.09;
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, idle + pointer.current.x * 0.16 + d.yaw, 5, delta);
-    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, pointer.current.y * 0.035, 4, delta);
+    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, idle + pointer.x * 0.18, 4, delta);
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, pointer.y * 0.04, 4, delta);
   });
-
   return <group ref={group}>{children}</group>;
 }
 
-function Slab({ index, palette, reduced, interactive, started }: { index: number } & Omit<Props, "labels">) {
+function KeyLight({ reduced }: { reduced: boolean }) {
+  const light = useRef<THREE.DirectionalLight>(null);
+  useFrame((_, delta) => {
+    const l = light.current;
+    if (!l || reduced) return;
+    l.position.x = THREE.MathUtils.damp(l.position.x, 6 + pointer.x * 5, 3, delta);
+    l.position.y = THREE.MathUtils.damp(l.position.y, 10 - pointer.y * 3, 3, delta);
+  });
+  return <directionalLight ref={light} position={[6, 10, 5]} intensity={1.9} />;
+}
+
+/** Mélange jour → nuit d'une couleur de la palette, selon la part de bleu nuit à l'écran. */
+function useMix(day: string, night: string) {
+  return useMemo(() => ({ day: new THREE.Color(day), night: new THREE.Color(night) }), [day, night]);
+}
+
+function Slab({ index, day, night, reduced, started }: { index: number } & Omit<Props, "wide">) {
   const group = useRef<THREE.Group>(null);
   const material = useRef<THREE.MeshStandardMaterial>(null);
   const edges = useRef<THREE.LineBasicMaterial>(null);
-  const first = place(index, ACCUEIL);
-  const x = useRef({ v: 0 });
+  const first = place(index);
+  const x = useRef({ v: first.x });
   const y = useRef({ v: first.y });
   const z = useRef({ v: 0 });
-  const opacity = useRef({ v: 1 });
+  const opacity = useRef({ v: first.alpha });
   const goldMix = useRef({ v: 0 });
-  const lift = useRef({ v: 0 });
-  const hovered = useRef(false);
   // Assemblage : chaque plaque tombe d'en haut et se pose sur la précédente, avec un éclair doré à l'impact.
   const drop = useRef({ v: reduced ? 0 : 7 + index * 0.8 });
   const appear = useRef({ v: reduced ? 1 : 0 });
   const flash = useRef({ v: 0 });
   const invalidate = useThree((s) => s.invalidate);
-  const base = useMemo(() => new THREE.Color(palette.edge), [palette.edge]);
-  const gold = useMemo(() => new THREE.Color(palette.gold), [palette.gold]);
-  const slab = useMemo(() => new THREE.Color(palette.slab), [palette.slab]);
-  // Une plaque mise en avant prend une teinte dorée pâle : visible sans devenir un aplat de couleur.
-  const slabGold = useMemo(
-    () => new THREE.Color(palette.slab).lerp(new THREE.Color(palette.gold), palette.goldTint),
-    [palette],
+  const slab = useMix(day.slab, night.slab);
+  const edge = useMix(day.edge, night.edge);
+  const gold = useMix(day.gold, night.gold);
+  const tint = useMemo(
+    () => ({
+      day: new THREE.Color(day.slab).lerp(new THREE.Color(day.gold), day.goldTint),
+      night: new THREE.Color(night.slab).lerp(new THREE.Color(night.gold), night.goldTint),
+    }),
+    [day, night],
   );
-  const layer = LAYERS[index];
+  const c = useMemo(() => ({ slab: new THREE.Color(), tint: new THREE.Color(), edge: new THREE.Color(), gold: new THREE.Color() }), []);
+  const celebrate = useStage((s) => s.celebrate);
 
   useEffect(() => {
     if (reduced || !started) return;
-    const tl = gsap.timeline({ delay: 0.15 + index * 0.16, onUpdate: invalidate });
-    tl.to(appear.current, { v: 1, duration: 0.25, ease: "none" }, 0)
-      .to(drop.current, { v: 0, duration: 0.85, ease: "bounce.out" }, 0)
-      .set(flash.current, { v: 1 }, 0.38);
+    const tl = gsap.timeline({ delay: 0.35 + index * 0.17, onUpdate: invalidate });
+    // Chute franche, sans rebond : la plaque se pose comme un bloc de plâtre.
+    tl.to(appear.current, { v: 1, duration: 0.2, ease: "none" }, 0)
+      .to(drop.current, { v: 0, duration: 0.9, ease: "expo.in" }, 0)
+      .set(flash.current, { v: 1 }, 0.9);
     return () => {
       tl.progress(1).kill();
     };
   }, [started, reduced, index, invalidate]);
 
+  // Message envoyé : un éclair doré remonte la pile, de la base au sommet.
+  useEffect(() => {
+    if (!celebrate) return;
+    const t = window.setTimeout(() => {
+      flash.current.v = 1;
+      invalidate();
+    }, index * 110);
+    return () => window.clearTimeout(t);
+  }, [celebrate, index, invalidate]);
+
   useFrame((_, delta) => {
-    // Sur mobile, la tour reste dans l'accueil : elle ne suit pas la section lue.
-    const s = interactive ? getStage() : ACCUEIL;
-    const p = place(index, s);
+    const p = place(index);
     const lambda = reduced ? 1000 : 3.2;
     let moving = approach(y.current, p.y, lambda, delta);
     moving = approach(x.current, p.x, lambda * 0.8, delta) || moving;
     moving = approach(z.current, p.z, lambda * 1.2, delta) || moving;
-    moving = approach(opacity.current, p.lit ? 1 : 0, lambda, delta) || moving;
+    moving = approach(opacity.current, p.alpha, lambda, delta) || moving;
     moving = approach(goldMix.current, p.gold ? 1 : 0, lambda * 1.4, delta) || moving;
-    moving = approach(lift.current, hovered.current && interactive ? 0.14 : 0, lambda * 2, delta) || moving;
+    if (flash.current.v > 0.001) moving = true;
     flash.current.v = THREE.MathUtils.damp(flash.current.v, 0, 2.6, delta);
 
     // Un paquet de données qui passe à la hauteur de la plaque l'allume brièvement.
@@ -239,47 +266,71 @@ function Slab({ index, palette, reduced, interactive, started }: { index: number
     const spark = Math.max(flash.current.v, glow * 0.75);
 
     if (group.current) {
-      group.current.position.set(x.current.v, y.current.v + drop.current.v + lift.current.v, z.current.v);
+      group.current.position.set(x.current.v, y.current.v + drop.current.v, z.current.v);
       group.current.visible = appear.current.v > 0.01 && opacity.current.v > 0.01;
     }
+    const n = live.night;
+    c.slab.copy(slab.day).lerp(slab.night, n);
+    c.tint.copy(tint.day).lerp(tint.night, n);
+    c.edge.copy(edge.day).lerp(edge.night, n);
+    c.gold.copy(gold.day).lerp(gold.night, n);
     const alpha = opacity.current.v * appear.current.v;
     if (material.current) {
       material.current.opacity = alpha;
-      material.current.color.copy(slab).lerp(slabGold, Math.max(goldMix.current.v, flash.current.v * 0.6));
+      material.current.color.copy(c.slab).lerp(c.tint, Math.max(goldMix.current.v, flash.current.v * 0.6));
       material.current.depthWrite = alpha > 0.99;
     }
     if (edges.current) {
-      edges.current.color.copy(base).lerp(gold, Math.max(goldMix.current.v, spark));
-      edges.current.opacity = alpha;
+      edges.current.color.copy(c.edge).lerp(c.gold, Math.max(goldMix.current.v, spark));
+      edges.current.opacity = Math.max(alpha, opacity.current.v < 0.5 ? appear.current.v * 0.35 : 0);
     }
     if (moving || drop.current.v > 0) invalidate();
   });
 
-  const pick = () => {
-    if (interactive && getStage().section === "competences") setStage({ layer: layer.id });
-  };
-
   return (
-    <group ref={group} position={[0, first.y + drop.current.v, 0]} visible={reduced}>
-      <RoundedBox
-        args={[SLAB.width, SLAB.height, SLAB.depth]}
-        radius={0.045}
-        smoothness={3}
-        castShadow
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          hovered.current = true;
-          pick();
-        }}
-        onPointerOut={() => {
-          hovered.current = false;
-        }}
-        onClick={pick}
-      >
-        <meshStandardMaterial ref={material} color={palette.slab} roughness={0.92} metalness={0} transparent />
+    <group ref={group} position={[first.x, first.y + drop.current.v, 0]} visible={reduced}>
+      <RoundedBox args={[SLAB.width, SLAB.height, SLAB.depth]} radius={0.045} smoothness={3}>
+        <meshStandardMaterial ref={material} color={day.slab} roughness={0.92} metalness={0} transparent />
         <Edges threshold={20}>
-          <lineBasicMaterial ref={edges} color={palette.edge} transparent />
+          <lineBasicMaterial ref={edges} color={day.edge} transparent />
         </Edges>
+      </RoundedBox>
+    </group>
+  );
+}
+
+/**
+ * La dernière plaque : au contact, une fine plaque dorée vient coiffer la pile.
+ * Le projet commun qui reste à construire.
+ */
+function Cap({ day, night, reduced }: Omit<Props, "wide" | "started">) {
+  const group = useRef<THREE.Group>(null);
+  const material = useRef<THREE.MeshStandardMaterial>(null);
+  const lift = useRef({ v: 4 });
+  const alpha = useRef({ v: 0 });
+  const invalidate = useThree((s) => s.invalidate);
+  const gold = useMix(day.gold, night.gold);
+  const color = useMemo(() => new THREE.Color(), []);
+  useFrame((_, delta) => {
+    const { id, t } = reading();
+    const on = id === "contact" && t > 0.08;
+    const lambda = reduced ? 1000 : 2.8;
+    let moving = approach(lift.current, on ? 0 : 4, lambda, delta);
+    moving = approach(alpha.current, on ? 1 : 0, lambda * 1.5, delta) || moving;
+    if (group.current) {
+      group.current.position.y = slabY(LAYERS.length, live.spread) - SLAB.height / 4 + lift.current.v;
+      group.current.visible = alpha.current.v > 0.01;
+    }
+    if (material.current) {
+      material.current.opacity = alpha.current.v;
+      material.current.color.copy(color.copy(gold.day).lerp(gold.night, live.night));
+    }
+    if (moving) invalidate();
+  });
+  return (
+    <group ref={group} visible={false}>
+      <RoundedBox args={[SLAB.width * 0.92, SLAB.height * 0.5, SLAB.depth * 0.92]} radius={0.03} smoothness={3}>
+        <meshStandardMaterial ref={material} color={day.gold} roughness={0.6} metalness={0.15} transparent />
       </RoundedBox>
     </group>
   );
@@ -289,33 +340,29 @@ function Slab({ index, palette, reduced, interactive, started }: { index: number
  * Le flux : une colonne sur le flanc de la pile. Des paquets dorés la remontent en continu,
  * et une impulsion la descend puis la remonte (une requête, sa réponse) à chaque changement de lecture.
  */
-function Flow({ palette, reduced, interactive, started }: Omit<Props, "labels">) {
+function Flow({ day, reduced, started }: Omit<Props, "wide" | "night">) {
   const pulse = useRef<THREE.Mesh>(null);
   const packets = useRef<(THREE.Mesh | null)[]>([]);
   const invalidate = useThree((s) => s.invalidate);
   // Sur le flanc droit, détachée de la pile : on la lit comme une conduite, pas comme une arête.
   const x = SLAB.width / 2 + 0.4;
   const z = SLAB.depth / 2 - 0.35;
-  const full = stackTop(ACCUEIL);
+  const full = slabY(LAYERS.length - 1, 0) + 0.5;
   const riser = useRef<THREE.Mesh>(null);
   const height = useRef({ v: reduced ? full : 0 });
-  const current = useStage((s) => s.section);
+  const section = useStage((s) => s.section);
   const project = useStage((s) => s.project);
   const layer = useStage((s) => s.layer);
-  // Sur mobile, la tour reste dans l'accueil : ni la colonne ni l'impulsion ne suivent la lecture.
-  const section = interactive ? current : "accueil";
 
   useFrame((state, delta) => {
-    const s = interactive ? getStage() : ACCUEIL;
     // La colonne pousse avec l'assemblage, puis suit la hauteur de la pile.
-    const goal = started || reduced ? stackTop(s) : 0;
+    const goal = started || reduced ? stackTop() : 0;
     const moving = approach(height.current, goal, reduced ? 1000 : 1.6, delta);
     const h = height.current.v;
     if (riser.current) {
       riser.current.scale.y = Math.max(h, 0.001) / full;
       riser.current.position.y = h / 2;
     }
-    // Paquets en continu, régulièrement espacés, qui s'estompent en bas et en haut de la colonne.
     for (let k = 0; k < PACKETS; k++) {
       const mesh = packets.current[k];
       if (!mesh) continue;
@@ -337,7 +384,7 @@ function Flow({ palette, reduced, interactive, started }: Omit<Props, "labels">)
   useEffect(() => {
     const mesh = pulse.current;
     if (!mesh || reduced || !started) return;
-    const high = stackTop(interactive ? getStage() : ACCUEIL) - 0.2;
+    const high = stackTop() - 0.2;
     const material = mesh.material as THREE.MeshBasicMaterial;
     const tl = gsap.timeline({ onUpdate: invalidate, delay: 0.2 });
     tl.set(mesh.position, { y: high })
@@ -349,13 +396,13 @@ function Flow({ palette, reduced, interactive, started }: Omit<Props, "labels">)
     return () => {
       tl.kill();
     };
-  }, [section, project, layer, reduced, started, interactive, invalidate]);
+  }, [section, project, layer, reduced, started, invalidate]);
 
   return (
     <group position={[x, 0, z]}>
       <mesh ref={riser} position={[0, full / 2, 0]}>
         <cylinderGeometry args={[0.012, 0.012, full, 6]} />
-        <meshBasicMaterial color={palette.steel} transparent opacity={0.45} />
+        <meshBasicMaterial color={day.steel} transparent opacity={0.45} />
       </mesh>
       {Array.from({ length: PACKETS }, (_, k) => (
         <mesh
@@ -366,53 +413,79 @@ function Flow({ palette, reduced, interactive, started }: Omit<Props, "labels">)
           visible={false}
         >
           <sphereGeometry args={[0.04, 12, 12]} />
-          <meshBasicMaterial color={palette.gold} transparent opacity={0} />
+          <meshBasicMaterial color={day.gold} transparent opacity={0} />
         </mesh>
       ))}
       <mesh ref={pulse} position={[0, full, 0]}>
         <capsuleGeometry args={[0.03, 0.26, 4, 8]} />
-        <meshBasicMaterial color={palette.gold} transparent opacity={0} />
+        <meshBasicMaterial color={day.gold} transparent opacity={0} />
       </mesh>
     </group>
   );
 }
 
-/** Annotations façon plan d'architecte : un trait bleu acier et un nom, à gauche de chaque plaque. */
-function Labels({ palette, started, reduced }: { palette: ScenePalette; started: boolean; reduced: boolean }) {
+/** Annotations façon plan d'architecte : un trait bleu acier et le nom de la couche, à gauche de chaque plaque. */
+function Labels({ day, started, reduced }: { day: ScenePalette; started: boolean; reduced: boolean }) {
   const section = useStage((s) => s.section);
   const layer = useStage((s) => s.layer);
-  const step = useStage((s) => s.step);
-  // Les annotations arrivent une fois la pile posée, pas pendant la chute.
-  const [shown, setShown] = useState(false);
-  useEffect(() => {
-    if (!started) return;
-    const t = window.setTimeout(() => setShown(true), reduced ? 0 : 1300);
-    return () => window.clearTimeout(t);
-  }, [started, reduced]);
-  if (!shown) return null;
-  if (section !== "accueil" && section !== "competences" && section !== "etapes") return null;
-  const spread = POSES[section].spread;
+  const groups = useRef<(THREE.Group | null)[]>([]);
+  const spans = useRef<(HTMLSpanElement | null)[]>([]);
+  const shownAt = useRef(0);
+  const invalidate = useThree((s) => s.invalidate);
   const left = -SLAB.width / 2;
+  // Seulement dans les compétences : ailleurs, le texte de la page occupe déjà cette place (nom, frise).
+  const mode = section === "competences" ? "name" : null;
+
+  useFrame((state) => {
+    if (!started) return;
+    if (!shownAt.current) shownAt.current = state.clock.elapsedTime + (reduced ? 0 : 1.9);
+    const ready = state.clock.elapsedTime >= shownAt.current && scroll.page === "home";
+    LAYERS.forEach((_, i) => {
+      const g = groups.current[i];
+      const span = spans.current[i];
+      if (!g || !span) return;
+      const gy = slabY(i, live.spread);
+      // Rendu à la demande (mouvement réduit) : une image de plus pour que le texte rejoigne sa plaque.
+      if (Math.abs(g.position.y - gy) > 0.0005) invalidate();
+      g.position.y = gy;
+      const visible = ready && mode !== null && live.night < 0.5;
+      span.style.opacity = visible ? "1" : "0";
+      // Le trait suit le texte : rien n'est dessiné tant que la pile n'est pas posée.
+      g.visible = visible;
+    });
+  });
+
   return (
     <group>
       {LAYERS.map((l, i) => {
-        const y = slabY(i, spread);
-        // Sur les étapes, l'année seule : la ligne de la frise donne le reste.
-        const text = section === "etapes" ? (STEPS[i]?.period.split(",")[0] ?? "") : l.name;
-        if (!text) return null;
-        const active = section === "competences" ? layer === l.id : step === i;
+        const text = l.name;
+        const active = section === "competences" && layer === l.id;
         return (
-          <group key={l.id}>
+          <group
+            key={l.id}
+            ref={(g) => {
+              groups.current[i] = g;
+            }}
+          >
             <Line
               points={[
-                [left - 0.08, y, SLAB.depth / 2],
-                [left - 0.9, y, SLAB.depth / 2],
+                [left - 0.08, 0, SLAB.depth / 2],
+                [left - 0.9, 0, SLAB.depth / 2],
               ]}
-              color={active ? palette.gold : palette.steel}
+              color={active ? day.gold : day.steel}
               lineWidth={1}
+              transparent
+              opacity={text && mode ? 1 : 0}
             />
-            <Html position={[left - 0.95, y, SLAB.depth / 2]} center={false} zIndexRange={[10, 0]}>
-              <span className={`annotation${active ? " is-active" : ""}`} aria-hidden="true">
+            <Html position={[left - 0.95, 0, SLAB.depth / 2]} center={false} zIndexRange={[10, 0]}>
+              <span
+                ref={(s) => {
+                  spans.current[i] = s;
+                }}
+                className={`annotation${active ? " is-active" : ""}`}
+                aria-hidden="true"
+                style={{ opacity: 0 }}
+              >
                 {text}
               </span>
             </Html>
@@ -423,31 +496,56 @@ function Labels({ palette, started, reduced }: { palette: ScenePalette; started:
   );
 }
 
-export function Tower({ palette, reduced, labels, interactive, started }: Props) {
+export function Tower({ day, night, reduced, wide, started }: Props) {
   // En mouvement réduit, la tour est déjà assemblée : pas d'attente.
   const ready = started || reduced;
+  const shadow = useRef<THREE.Group>(null);
+
+  // La montée de caméra d'ouverture, depuis le pied de la pile jusqu'à la vue d'ensemble.
+  useEffect(() => {
+    if (reduced) {
+      scroll.intro = 1;
+      return;
+    }
+    if (!started) return;
+    const tween = gsap.to(scroll, { intro: 1, duration: 2.6, delay: 0.2, ease: "power3.inOut" });
+    // On défile déjà : l'ouverture se termine en accéléré plutôt que de laisser la tour hors cadre.
+    const hurry = () => {
+      if (window.scrollY > 40) tween.timeScale(5);
+    };
+    hurry();
+    window.addEventListener("scroll", hurry, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", hurry);
+      tween.kill();
+    };
+  }, [started, reduced]);
+
   return (
     <>
-      <CameraRig reduced={reduced} wide={interactive} />
+      <CameraRig reduced={reduced} wide={wide} />
       <hemisphereLight args={["#ffffff", "#c9d1dd", 1.6]} />
-      <directionalLight position={[6, 10, 5]} intensity={1.9} />
+      <KeyLight reduced={reduced} />
       <directionalLight position={[-6, 4, -3]} intensity={0.4} />
-      <Spin reduced={reduced} interactive={interactive}>
+      <Spin reduced={reduced}>
         {LAYERS.map((l, i) => (
-          <Slab key={l.id} index={i} palette={palette} reduced={reduced} interactive={interactive} started={ready} />
+          <Slab key={l.id} index={i} day={day} night={night} reduced={reduced} started={ready} />
         ))}
-        <Flow palette={palette} reduced={reduced} interactive={interactive} started={ready} />
-        {labels && <Labels palette={palette} started={ready} reduced={reduced} />}
+        <Cap day={day} night={night} reduced={reduced} />
+        <Flow day={day} reduced={reduced} started={ready} />
+        {wide && <Labels day={day} started={ready} reduced={reduced} />}
       </Spin>
-      <ContactShadows
-        position={[0, 0, 0]}
-        opacity={0.32}
-        scale={12}
-        blur={2.6}
-        far={6}
-        resolution={256}
-        color={palette.shadow}
-      />
+      <group ref={shadow}>
+        <ContactShadows
+          position={[0, 0, 0]}
+          opacity={0.3}
+          scale={12}
+          blur={2.6}
+          far={6}
+          resolution={256}
+          color={day.shadow}
+        />
+      </group>
     </>
   );
 }

@@ -217,12 +217,15 @@ export const VIDEO = {
   canonical: `${MAIN_SITE}/video`,
 };
 
-export type SectionId = "accueil" | "parcours" | "competences" | "projets" | "etapes" | "contact";
+export type SectionId = "accueil" | "apropos" | "parcours" | "competences" | "projets" | "contact";
+
+/** Les chapitres de l'accueil, dans l'ordre du défilement. */
+export const CHAPTERS: SectionId[] = ["accueil", "apropos", "parcours", "competences", "projets", "contact"];
 
 export const NAV: { id: SectionId; label: string }[] = [
+  { id: "apropos", label: "À propos" },
   { id: "parcours", label: "Parcours" },
   { id: "competences", label: "Compétences" },
   { id: "projets", label: "Projets" },
-  { id: "etapes", label: "Étapes" },
   { id: "contact", label: "Contact" },
 ];

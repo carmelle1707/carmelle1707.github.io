@@ -29,3 +29,13 @@ export const DARK: ScenePalette = {
   shadow: "#000000",
   goldTint: 0.2,
 };
+
+/** Au contact, sur le bleu nuit : des plaques plus claires que le fond, aux arêtes nettes, pour rester lisibles. */
+export const NIGHT: ScenePalette = {
+  slab: "#26365a",
+  edge: "#7489ad",
+  gold: "#e0b665",
+  steel: "#9dbde6",
+  shadow: "#000000",
+  goldTint: 0.28,
+};

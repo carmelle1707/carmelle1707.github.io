@@ -1,15 +1,18 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect } from "react";
 import { LAYERS, PROJECTS, type Project } from "../content/site";
 import { projectPath } from "../content/routes";
 import { setStage } from "../state/store";
 import { Fill } from "../sections/Sections";
+import { shotTransition } from "../lib/transitions";
+import { scroll } from "../motion/scroll";
 
 /**
  * La page d'un projet : la tour se reconstruit avec les seules couches qu'il utilise,
  * et la fiche dit ce que j'y ai fait, avec quoi.
  */
-export function ProjectPage({ project, stage }: { project: Project; stage: ReactNode }) {
+export function ProjectPage({ project }: { project: Project }) {
   useEffect(() => {
+    scroll.page = "project";
     setStage({ section: "projets", project: project.slug, layer: null, step: null });
   }, [project.slug]);
 
@@ -19,6 +22,7 @@ export function ProjectPage({ project, stage }: { project: Project; stage: React
 
   return (
     <article className="project-page" aria-labelledby="project-title" data-section="projets">
+      <div className="chapter-window" data-window aria-hidden="true" />
       <nav aria-label="Fil d'Ariane" className="crumbs">
         <a href="/#projets">Tous les projets</a>
       </nav>
@@ -28,7 +32,6 @@ export function ProjectPage({ project, stage }: { project: Project; stage: React
         </h1>
         {project.context && <p className="project-context">{project.context}</p>}
       </header>
-      <div className="hero-stage">{stage}</div>
       {project.image ? (
         <img
           className="project-shot"
@@ -37,9 +40,10 @@ export function ProjectPage({ project, stage }: { project: Project; stage: React
           width={project.image.width}
           height={project.image.height}
           decoding="async"
+          style={shotTransition(project.slug)}
         />
       ) : (
-        <div className="project-shot project-shot-empty">
+        <div className="project-shot project-shot-empty" style={shotTransition(project.slug)}>
           <span>Pas encore de capture</span>
         </div>
       )}
