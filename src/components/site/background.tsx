@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { SiteContent } from "@/lib/content-types";
 import { PORTRAIT } from "@/lib/portrait";
+import { WECODE_PHOTOS } from "@/lib/gallery";
 import { SectionHead } from "./section-head";
 
 /** Compétences et parcours, côte à côte sur desktop. */
@@ -111,6 +112,27 @@ export function Background({
           </div>
         )}
       </div>
+      {education.length > 0 && (
+        <figure className="wrap mt-20" data-reveal>
+          <ul className="m-0 grid list-none gap-4 p-0 min-[641px]:grid-cols-3">
+            {WECODE_PHOTOS.map((p) => (
+              <li key={p.src} className="min-w-0">
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  width={p.width}
+                  height={p.height}
+                  sizes="(min-width: 641px) 33vw, 100vw"
+                  className="aspect-[3/2] w-full rounded-[22px] object-cover"
+                />
+              </li>
+            ))}
+          </ul>
+          <figcaption className="mt-3 font-mono text-xs tracking-[0.08em] text-muted uppercase">
+            Remise des attestations WeCode · Abidjan
+          </figcaption>
+        </figure>
+      )}
     </section>
   );
 }

@@ -148,6 +148,9 @@ describe("SEO", () => {
     expect(home?.images).toEqual([
       "https://ange-carmelle.dev/images/photo-profil.jpeg",
       "https://ange-carmelle.dev/images/ange-carmelle-gbedji-portrait.jpg",
+      "https://ange-carmelle.dev/images/ange-carmelle-gbedji-attestation-wecode.jpg",
+      "https://ange-carmelle.dev/images/ange-carmelle-gbedji-graduation-wecode.jpg",
+      "https://ange-carmelle.dev/images/ange-carmelle-gbedji-promotion-wecode.jpg",
     ]);
     expect(page?.videos?.[0]).toMatchObject({
       content_loc: "https://ange-carmelle.dev/videos/presentation-carre.mp4",

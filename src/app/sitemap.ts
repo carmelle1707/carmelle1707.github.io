@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getPagesContent, projectPath, servicePath } from "@/lib/pages";
+import { WECODE_PHOTOS } from "@/lib/gallery";
 import { PORTRAIT } from "@/lib/portrait";
 import { siteUrl } from "@/lib/site-url";
 import { PRESENTATION_VIDEO } from "@/lib/video";
@@ -10,7 +11,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { content, services, projects } = await getPagesContent();
   const absolute = (path: string) => new URL(path, `${url}/`).toString();
   // Photos de la personne visibles sur l'accueil, déclarées pour Google Images
-  const photos = [content.profile.photo?.url, PORTRAIT.src].filter((p): p is string => !!p);
+  const photos = [
+    content.profile.photo?.url,
+    PORTRAIT.src,
+    ...WECODE_PHOTOS.map((p) => p.src),
+  ].filter((p): p is string => !!p);
   return [
     {
       url: `${url}/`,
