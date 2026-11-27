@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import admin from "./admin.json";
 import { LAYERS, NAV, PROFILE, PROJECTS, WECODE_PHOTOS, buildContent, fromMain, layerOf, type AdminContent } from "./site";
 import { DESCRIPTION, TITLE, headTags, robots, sitemap, structuredData } from "../seo";
+import { ROUTES, matchRoute } from "./routes";
 
 const publicFile = (path: string) => fileURLToPath(new URL(`../../public${path}`, import.meta.url));
 
@@ -104,10 +105,30 @@ describe("référencement de la V2", () => {
     expect(head.match(/<\/script>/g)).toHaveLength(1);
   });
 
+  it("chaque projet a sa page, indexée avec sa propre canonique", () => {
+    for (const p of PROJECTS) {
+      const route = matchRoute(`/projets/${p.slug}/`);
+      expect(route.kind).toBe("project");
+      const head = headTags(`/projets/${p.slug}`);
+      expect(head).toContain(`rel="canonical" href="https://ange-carmelle-gbedji-3d.vercel.app/projets/${p.slug}"`);
+      expect(head).toContain(`<title>${p.title.replace(/&/g, "&amp;")}`);
+    }
+    expect(ROUTES.map((r) => r.file)).toContain("video/index.html");
+  });
+
+  it("la vidéo renvoie Google vers la page du site Next.js, la 404 n'est pas indexée", () => {
+    expect(headTags("/video")).toContain('rel="canonical" href="https://ange-carmelle-gbedji.vercel.app/video"');
+    expect(headTags("/video")).toContain('property="og:video"');
+    expect(matchRoute("/projets/inconnu").kind).toBe("notfound");
+    expect(headTags("/404")).toContain('content="noindex"');
+  });
+
   it("le sitemap liste la page et ses images, robots.txt le signale", () => {
     const xml = sitemap("2026-11-27");
     expect(xml).toContain("<loc>https://ange-carmelle-gbedji-3d.vercel.app/</loc>");
     expect(xml).toContain("graduation-wecode.jpg");
+    for (const p of PROJECTS) expect(xml).toContain(`/projets/${p.slug}</loc>`);
+    expect(xml).not.toContain("/video</loc>");
     expect(robots()).toContain("Sitemap: https://ange-carmelle-gbedji-3d.vercel.app/sitemap.xml");
   });
 });

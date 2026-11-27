@@ -684,3 +684,110 @@ html[data-boot="1"]::before {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------- Pages projet et vidéo ---------- */
+.crumbs a {
+  color: var(--color-muted);
+  text-decoration-color: var(--color-gold);
+}
+.crumbs a:hover {
+  color: var(--color-ink);
+}
+.project-page,
+.video-page {
+  display: grid;
+  align-content: start;
+  gap: var(--space-lg);
+  padding-block: var(--space-2xl) var(--section-gap-s);
+  min-width: 0;
+}
+.project-page h1,
+.video-page h1 {
+  font-size: var(--text-display-s);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: var(--tracking-display);
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+.project-head .project-context {
+  margin-top: var(--space-xs);
+}
+.project-lead {
+  font-size: var(--text-lead);
+  max-width: 52ch;
+}
+.project-next {
+  display: grid;
+  gap: var(--space-2xs);
+  padding-top: var(--space-lg);
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+.project-next span {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+.project-next a {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  text-decoration-color: var(--color-gold);
+}
+.about-video {
+  margin-top: calc(var(--space-xs) * -1);
+}
+.single {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.video-page {
+  max-width: 52rem;
+}
+.video-frame {
+  margin: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+.video-frame video {
+  width: 100%;
+  border-radius: var(--radius-card);
+  background: var(--color-band);
+}
+.video-square {
+  aspect-ratio: 1 / 1;
+  max-width: 44rem;
+}
+.video-vertical {
+  display: none;
+  aspect-ratio: 9 / 16;
+  max-width: 22rem;
+}
+.video-frame figcaption {
+  color: var(--color-muted);
+  max-width: 60ch;
+}
+.video-projects h2 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-xs);
+}
+.video-projects ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2xs);
+}
+.video-projects a {
+  font-weight: 700;
+  text-decoration-color: var(--color-gold);
+}
+@media (max-width: 40rem) {
+  .video-square {
+    display: none;
+  }
+  .video-vertical {
+    display: block;
+  }
+}

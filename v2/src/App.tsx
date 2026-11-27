@@ -4,14 +4,18 @@ import { About, Contact, Footer, Header, Hero, Projects, Skills, Steps } from ".
 import { detectSceneMode, useReducedMotion, useWideScreen, type SceneMode } from "./lib/capabilities";
 import { setStage } from "./state/store";
 import type { SectionId } from "./content/site";
+import { matchRoute } from "./content/routes";
+import { ProjectPage } from "./pages/ProjectPage";
+import { NotFound, VideoPage } from "./pages/VideoPage";
 
 type StageProps = { reduced: boolean; wide: boolean; waiting: boolean; onReady: () => void; onDecline: () => void };
 
 const BOOT_KEY = "carmelle-boot";
 
 /** La section qui occupe le milieu de l'écran pilote la tour. */
-function useActiveSection() {
+function useActiveSection(enabled: boolean) {
   useEffect(() => {
+    if (!enabled) return;
     const sections = document.querySelectorAll<HTMLElement>("[data-section]");
     const io = new IntersectionObserver(
       (entries) => {
@@ -23,7 +27,7 @@ function useActiveSection() {
     );
     sections.forEach((s) => io.observe(s));
     return () => io.disconnect();
-  }, []);
+  }, [enabled]);
 }
 
 /** Image fixe de la tour : appareils sans WebGL, peu puissants ou en économie de données. */
@@ -36,7 +40,11 @@ function Still() {
   );
 }
 
-export default function App() {
+export default function App({ path }: { path: string }) {
+  const route = matchRoute(path);
+  const home = route.kind === "home";
+  /** La tour n'a pas sa place sur la vidéo ni sur la page introuvable. */
+  const tower = home || route.kind === "project";
   const reduced = useReducedMotion();
   const wide = useWideScreen();
   const [mode, setMode] = useState<SceneMode>("pending");
@@ -45,17 +53,21 @@ export default function App() {
   const [frame, setFrame] = useState(false);
   const [boot, setBoot] = useState(false);
 
-  useActiveSection();
+  useActiveSection(home);
 
   useEffect(() => {
+    const root = document.documentElement;
+    // Le script de index.html cache la page derrière l'écran de démarrage : seul l'accueil le garde.
+    if (!tower) {
+      delete root.dataset.boot;
+      return;
+    }
     const m = detectSceneMode();
     setMode(m);
-    const root = document.documentElement;
-    // Le script de index.html a déjà caché la page derrière l'écran de démarrage si besoin.
-    if (m === "3d" && root.dataset.boot === "1") setBoot(true);
+    if (m === "3d" && home && root.dataset.boot === "1") setBoot(true);
     delete root.dataset.boot;
     document.fonts.ready.then(() => setFonts(true));
-  }, []);
+  }, [tower, home]);
 
   useEffect(() => {
     if (mode !== "3d") return;
@@ -76,7 +88,7 @@ export default function App() {
       // Navigation privée : l'intro reviendra à la prochaine visite, rien de grave.
     }
     // Le dialogue disparaît : le focus revient au début du contenu, pas dans le vide.
-    document.getElementById("hero-title")?.focus({ preventScroll: true });
+    document.querySelector<HTMLElement>("h1")?.focus({ preventScroll: true });
   };
 
   const scene =
@@ -96,20 +108,32 @@ export default function App() {
         Aller au contenu
       </a>
       {boot && <Boot fonts={fonts} scene={Stage !== null} frame={frame} onDone={finishBoot} />}
-      <Header />
-      <div className="layout">
-        <main id="contenu" className="content">
-          <Hero stage={wide ? null : scene} />
-          <About />
-          <Skills />
-          <Projects />
-          <Steps />
-          <Contact />
+      <Header home={home} />
+      {tower ? (
+        <div className="layout">
+          <main id="contenu" className="content">
+            {route.kind === "project" ? (
+              <ProjectPage project={route.project} stage={wide ? null : scene} />
+            ) : (
+              <>
+                <Hero stage={wide ? null : scene} />
+                <About />
+                <Skills />
+                <Projects />
+                <Steps />
+                <Contact />
+              </>
+            )}
+          </main>
+          <aside className="stage" aria-hidden="true">
+            <div className="stage-sticky">{wide ? scene : null}</div>
+          </aside>
+        </div>
+      ) : (
+        <main id="contenu" className="single">
+          {route.kind === "video" ? <VideoPage /> : <NotFound />}
         </main>
-        <aside className="stage" aria-hidden="true">
-          <div className="stage-sticky">{wide ? scene : null}</div>
-        </aside>
-      </div>
+      )}
       <Footer />
     </>
   );

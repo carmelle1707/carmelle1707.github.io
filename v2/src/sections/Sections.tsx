@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { CONTACT, LAYERS, NAV, PROFILE, PROJECTS, STEPS, TOOLS, WECODE_PHOTOS, type SectionId } from "../content/site";
 import { ContactForm } from "./ContactForm";
+import { projectPath } from "../content/routes";
 import { setStage, useStage } from "../state/store";
 
 /** Un fait que le contenu ne donne pas encore : un emplacement visible, jamais une valeur inventée. */
@@ -8,13 +9,15 @@ export function Fill({ children }: { children: ReactNode }) {
   return <span className="fill">{children}</span>;
 }
 
-export function Header() {
+export function Header({ home }: { home: boolean }) {
+  // Hors de l'accueil, les ancres renvoient vers les sections de l'accueil.
+  const base = home ? "" : "/";
   const section = useStage((s) => s.section);
   const [open, setOpen] = useState(false);
   return (
     <header className="site-header">
       <div className="header-inner">
-        <a className="wordmark" href="#accueil" aria-label="Ange Carmelle, retour à l'accueil">
+        <a className="wordmark" href={home ? "#accueil" : "/"} aria-label="Ange Carmelle, retour à l'accueil">
           Ange Carmelle
         </a>
         <button
@@ -31,8 +34,8 @@ export function Header() {
             {NAV.map((n) => (
               <li key={n.id}>
                 <a
-                  href={`#${n.id}`}
-                  aria-current={section === n.id ? "true" : undefined}
+                  href={`${base}#${n.id}`}
+                  aria-current={home && section === n.id ? "true" : undefined}
                   onClick={() => setOpen(false)}
                 >
                   {n.label}
@@ -91,6 +94,11 @@ export function About() {
         />
       </figure>
       <p>{PROFILE.bio}</p>
+      <p className="about-video">
+        <a className="btn-text" href="/video">
+          Me voir en 60 secondes, en vidéo
+        </a>
+      </p>
       <figure className="gallery">
         <ul>
           {WECODE_PHOTOS.map((p) => (
@@ -203,15 +211,14 @@ export function Projects() {
           )}
         </dl>
         {project.missing && <Fill>{project.missing}</Fill>}
-        {project.links.length > 0 && (
-          <p className="project-links">
-            {project.links.map((l) => (
-              <a key={l.href} href={l.href} target="_blank" rel="noopener">
-                {l.label}
-              </a>
-            ))}
-          </p>
-        )}
+        <p className="project-links">
+          <a href={projectPath(project.slug)}>Page du projet</a>
+          {project.links.map((l) => (
+            <a key={l.href} href={l.href} target="_blank" rel="noopener">
+              {l.label}
+            </a>
+          ))}
+        </p>
       </article>
     </Section>
   );
@@ -289,6 +296,7 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <p>© 2026 {PROFILE.name}</p>
+      <a href="/video">La vidéo de présentation</a>
       <a href={PROFILE.classicSite}>Version classique du portfolio</a>
     </footer>
   );

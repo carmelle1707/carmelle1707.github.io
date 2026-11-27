@@ -16,7 +16,7 @@
     <script>
       // Écran de démarrage CARMELLE.EXE : une fois par session, jamais si l'on a demandé moins d'animations.
       try {
-        if (!matchMedia("(prefers-reduced-motion: reduce)").matches && !sessionStorage.getItem("carmelle-boot")) {
+        if (location.pathname === "/" && !matchMedia("(prefers-reduced-motion: reduce)").matches && !sessionStorage.getItem("carmelle-boot")) {
           document.documentElement.dataset.boot = "1";
         }
       } catch (e) {}

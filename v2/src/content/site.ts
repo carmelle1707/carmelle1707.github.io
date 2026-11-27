@@ -200,6 +200,23 @@ export const WECODE_PHOTOS = [
   },
 ].map((p) => ({ ...p, width: 1400, height: 933 }));
 
+/** La vidéo de présentation (60 s), servie par le site Next.js : une seule copie des fichiers. */
+export const VIDEO = {
+  title: `${admin.profile.name} en 60 secondes`,
+  description:
+    "Présentation en 60 secondes : son parcours, ses projets (Flot, YOWL, CinéScope, Post-it) et les technologies qu'elle utilise, du web au mobile.",
+  uploadDate: "2026-11-04",
+  square: { src: `${MAIN_SITE}/videos/presentation-carre.mp4`, poster: `${MAIN_SITE}/videos/presentation-carre.jpg`, width: 720, height: 720 },
+  vertical: {
+    src: `${MAIN_SITE}/videos/presentation-vertical.mp4`,
+    poster: `${MAIN_SITE}/videos/presentation-vertical.jpg`,
+    width: 720,
+    height: 1280,
+  },
+  /** La page de lecture que Google indexe : celle du site Next.js. */
+  canonical: `${MAIN_SITE}/video`,
+};
+
 export type SectionId = "accueil" | "parcours" | "competences" | "projets" | "etapes" | "contact";
 
 export const NAV: { id: SectionId; label: string }[] = [
