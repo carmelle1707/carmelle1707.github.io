@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { NAV, PROFILE, type SectionId } from "../content/site";
 import { useStage } from "../state/store";
 
@@ -29,6 +29,20 @@ export function Header({ home }: { home: boolean }) {
   const base = home ? "" : "/";
   const section = useStage((s) => s.section);
   const [open, setOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+
+  // Échap ferme le menu mobile et rend le focus au bouton qui l'a ouvert.
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      menuButton.current?.focus();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
   return (
     <header className="site-header">
       <div className="header-inner">
@@ -36,10 +50,12 @@ export function Header({ home }: { home: boolean }) {
           Ange Carmelle
         </a>
         <button
+          ref={menuButton}
           type="button"
           className="menu-toggle"
           aria-expanded={open}
           aria-controls="site-nav"
+          aria-label={open ? "Fermer le menu de navigation" : "Ouvrir le menu de navigation"}
           onClick={() => setOpen((o) => !o)}
         >
           {open ? "Fermer" : "Menu"}
