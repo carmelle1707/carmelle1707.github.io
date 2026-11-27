@@ -36,7 +36,9 @@ export function makePage(small: boolean) {
   canvas.height = h;
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 4;
+  texture.anisotropy = 8;
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
   return { canvas, texture };
 }
 
