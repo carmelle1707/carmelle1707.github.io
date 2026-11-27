@@ -705,40 +705,142 @@ main,
   display: inline-flex;
   align-items: center;
 }
-/* Galerie épinglée (grand écran) : la tour à gauche, les projets défilent dans la moitié droite. */
-.projects.is-track > .panel {
+/* Tourner les pages, partout : deux boutons sobres sous la fiche. */
+.book-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+.book-turn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  font: inherit;
+  font-weight: 700;
+  color: var(--color-ink);
+  background: transparent;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-short) var(--ease-out),
+    background-color var(--dur-short) var(--ease-out);
+}
+.book-turn svg {
+  width: 1.1em;
+  height: 1.1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--dur-short) var(--ease-out);
+}
+.book-turn:hover:not(:disabled) {
+  border-color: var(--color-gold);
+}
+.book-turn[data-dir="prev"]:hover:not(:disabled) svg {
+  transform: translateX(-3px);
+}
+.book-turn[data-dir="next"]:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+.book-turn:active:not(:disabled) {
+  background: var(--color-paper-3);
+}
+.book-turn:disabled {
+  color: var(--color-muted);
+  cursor: default;
+  opacity: 0.55;
+}
+.book-surface,
+.book-hint {
+  display: none;
+}
+
+/* Le livre (grand écran) : la fiche à gauche, le livre posé sur la tour à droite, qu'on tourne au doigt. */
+.projects.is-book > .panel {
   padding-block: 0;
 }
-.projects.is-track .projects-pin {
+.projects.is-book .projects-pin {
+  position: relative;
   height: 100svh;
   display: grid;
-  grid-template-columns: minmax(0, 40%) minmax(0, 60%);
-  grid-template-rows: auto 1fr;
+  grid-template-columns: minmax(0, 36%) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  column-gap: var(--space-2xl);
   padding-top: calc(64px + var(--space-xl));
   padding-bottom: var(--space-xl);
 }
-.projects.is-track .projects-head {
-  grid-column: 1 / -1;
+.projects.is-book .projects-head {
+  grid-column: 1;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--space-xs);
 }
-.projects.is-track .gallery-viewport {
-  /* Les projets qui sortent par la gauche s'effacent au lieu d'être coupés net. */
-  mask-image: linear-gradient(90deg, transparent, #000 7%);
-  grid-column: 2;
+.projects.is-book .gallery-viewport {
+  grid-column: 1;
   grid-row: 2;
-  overflow: clip;
-  margin: var(--space-md) calc(var(--gutter) * -1) 0 0;
-  padding: 0;
   align-self: center;
+  overflow: visible;
+  margin: 0;
+  padding: 0;
 }
-.projects.is-track .gallery-track {
-  padding-right: 18vw;
+.projects.is-book .gallery-track {
+  display: grid;
+  width: auto;
+  padding: 0;
 }
-.projects.is-track .gallery-item {
-  width: min(38vw, 40rem);
+.projects.is-book .gallery-item {
+  grid-area: 1 / 1;
+  width: auto;
+  visibility: hidden;
 }
-.projects.is-track .gallery-shot img,
-.projects.is-track .gallery-empty {
-  aspect-ratio: 16 / 9;
+.projects.is-book .gallery-item.is-current {
+  visibility: visible;
+}
+/* La capture est imprimée dans le livre : la fiche garde le texte. */
+.projects.is-book .gallery-shot {
+  display: none;
+}
+.projects.is-book .gallery-info h3 {
+  font-size: var(--text-3xl);
+  line-height: 1.02;
+  letter-spacing: var(--tracking-display);
+}
+.projects.is-book .gallery-desc {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+.projects.is-book .book-nav {
+  grid-column: 1;
+  grid-row: 3;
+}
+.projects.is-book .book-surface {
+  display: block;
+  grid-column: 2;
+  grid-row: 1 / -1;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+.projects.is-book .book-surface.is-dragging {
+  cursor: grabbing;
+}
+.projects.is-book .book-hint {
+  display: block;
+  position: absolute;
+  right: 0;
+  bottom: var(--space-xl);
+  width: calc(64% - var(--space-2xl));
+  text-align: center;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  pointer-events: none;
 }
 
 /* ---------- Contact : la nuit ---------- */

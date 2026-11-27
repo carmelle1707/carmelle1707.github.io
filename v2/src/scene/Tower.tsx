@@ -8,6 +8,7 @@ import { getStage, useStage } from "../state/store";
 import { pointer, scroll } from "../motion/scroll";
 import { SLAB, introPose, mix, poseFor, projectPagePose, slabY, type Pose } from "./poses";
 import type { ScenePalette } from "./palette";
+import { Book } from "./book/Book";
 
 /** Paquets de données qui remontent la colonne : leur hauteur, lue par les plaques qu'ils traversent. */
 const PACKETS = 3;
@@ -49,7 +50,7 @@ function place(i: number): Place {
   const { id, t } = reading();
   const s = getStage();
   let y = slabY(i, live.spread);
-  let x = 0;
+  const x = 0;
   let z = 0;
   let alpha = 1;
   let gold = false;
@@ -70,23 +71,17 @@ function place(i: number): Place {
       if (gold) z = 0.75;
       break;
     case "projets": {
+      // Le livre est posé sur la tour : elle reste entière, et les couches du projet ouvert s'allument.
       const project = PROJECTS.find((p) => p.slug === s.project);
-      if (!project || project.layers.length === 0) break;
-      // La tour se reconstruit avec les seules couches du projet ; les autres glissent hors de la pile.
-      const used = LAYERS.map((l, k) => ({ id: l.id, k })).filter((o) => project.layers.includes(o.id));
-      const rank = used.findIndex((o) => o.k === i);
-      if (rank >= 0) {
-        y = slabY(rank, live.spread);
-        gold = true;
-      } else {
-        alpha = 0;
-        x = -(SLAB.width + 0.9);
-      }
+      gold = !!project && project.layers.includes(LAYERS[i].id);
       break;
     }
   }
   return { x, y, z, alpha, gold };
 }
+
+/** Le dessus de la plaque du haut : le livre s'y pose, même pendant que la pile se resserre. */
+const bookTop = () => slabY(LAYERS.length - 1, live.spread) + SLAB.height / 2;
 
 /** Haut de la pile visible : la colonne de flux s'arrête là. */
 function stackTop() {
@@ -176,9 +171,11 @@ function Spin({ children, reduced }: { children: React.ReactNode; reduced: boole
   useFrame((state, delta) => {
     const g = group.current;
     if (!g || reduced) return;
-    const idle = Math.sin(state.clock.elapsedTime * 0.35) * 0.09;
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, idle + pointer.x * 0.18, 4, delta);
-    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, pointer.y * 0.04, 4, delta);
+    // Pendant la lecture du livre, la tour se tient presque immobile : on tourne des pages, pas la sculpture.
+    const k = scroll.active === "projets" && scroll.page === "home" ? 0.25 : 1;
+    const idle = Math.sin(state.clock.elapsedTime * 0.35) * 0.09 * k;
+    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, idle + pointer.x * 0.18 * k, 4, delta);
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, pointer.y * 0.04 * k, 4, delta);
   });
   return <group ref={group}>{children}</group>;
 }
@@ -294,43 +291,6 @@ function Slab({ index, day, night, reduced, started }: { index: number } & Omit<
         <Edges threshold={20}>
           <lineBasicMaterial ref={edges} color={day.edge} transparent />
         </Edges>
-      </RoundedBox>
-    </group>
-  );
-}
-
-/**
- * La dernière plaque : au contact, une fine plaque dorée vient coiffer la pile.
- * Le projet commun qui reste à construire.
- */
-function Cap({ day, night, reduced }: Omit<Props, "wide" | "started">) {
-  const group = useRef<THREE.Group>(null);
-  const material = useRef<THREE.MeshStandardMaterial>(null);
-  const lift = useRef({ v: 4 });
-  const alpha = useRef({ v: 0 });
-  const invalidate = useThree((s) => s.invalidate);
-  const gold = useMix(day.gold, night.gold);
-  const color = useMemo(() => new THREE.Color(), []);
-  useFrame((_, delta) => {
-    const { id, t } = reading();
-    const on = id === "contact" && t > 0.08;
-    const lambda = reduced ? 1000 : 2.8;
-    let moving = approach(lift.current, on ? 0 : 4, lambda, delta);
-    moving = approach(alpha.current, on ? 1 : 0, lambda * 1.5, delta) || moving;
-    if (group.current) {
-      group.current.position.y = slabY(LAYERS.length, live.spread) - SLAB.height / 4 + lift.current.v;
-      group.current.visible = alpha.current.v > 0.01;
-    }
-    if (material.current) {
-      material.current.opacity = alpha.current.v;
-      material.current.color.copy(color.copy(gold.day).lerp(gold.night, live.night));
-    }
-    if (moving) invalidate();
-  });
-  return (
-    <group ref={group} visible={false}>
-      <RoundedBox args={[SLAB.width * 0.92, SLAB.height * 0.5, SLAB.depth * 0.92]} radius={0.03} smoothness={3}>
-        <meshStandardMaterial ref={material} color={day.gold} roughness={0.6} metalness={0.15} transparent />
       </RoundedBox>
     </group>
   );
@@ -531,7 +491,7 @@ export function Tower({ day, night, reduced, wide, started }: Props) {
         {LAYERS.map((l, i) => (
           <Slab key={l.id} index={i} day={day} night={night} reduced={reduced} started={ready} />
         ))}
-        <Cap day={day} night={night} reduced={reduced} />
+        <Book reduced={reduced} wide={wide} top={bookTop} />
         <Flow day={day} reduced={reduced} started={ready} />
         {wide && <Labels day={day} started={ready} reduced={reduced} />}
       </Spin>

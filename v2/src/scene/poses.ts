@@ -37,6 +37,10 @@ export const INTRO: Pose = { camera: [2.6, 0.5, 5.2], target: [0, 0.5, 0], sprea
 
 const TOP = slabY(LAYERS.length - 1, 1);
 
+/** Le livre des projets, posé à plat sur la tour assemblée : une page fait `width` × `height`. */
+export const BOOK = { width: 1.55, height: 2.15 };
+export const BOOK_Y = slabY(LAYERS.length - 1, 0) + SLAB.height / 2;
+
 /** Chaque chapitre a sa pose, qui évolue avec l'avancée `t` (0 à 1) dans le chapitre. */
 const WIDE: Record<SectionId, (t: number) => Pose> = {
   // La tour entière de trois quarts, à droite du nom ; en quittant l'accueil, la caméra recule.
@@ -65,11 +69,11 @@ const WIDE: Record<SectionId, (t: number) => Pose> = {
     const y = lerp(TOP, slabY(0, 1), t);
     return { camera: [11, y + 3.8, 12.6], target: [0, y, 0], spread: 1, shift: [0.25, -0.02] };
   },
-  // La tour passe à gauche, la galerie défile à droite.
+  // Au-dessus du livre, en plongée : la caméra glisse lentement d'une page à l'autre pendant la lecture.
   projets: (t) =>
     mix(
-      { camera: [10.6, 7.6, 12.2], target: [0, 1.2, 0], spread: 0.35, shift: [-0.3, -0.04] },
-      { camera: [11.4, 8.2, 12.8], target: [0, 1.2, 0], spread: 0.35, shift: [-0.3, -0.04] },
+      { camera: [1, BOOK_Y + 8.9, 5.9], target: [0.05, BOOK_Y - 0.25, 0.3], spread: 0, shift: [0.2, 0.02] },
+      { camera: [-0.4, BOOK_Y + 8.4, 5.4], target: [-0.05, BOOK_Y - 0.25, 0.3], spread: 0, shift: [0.2, 0.02] },
       t,
     ),
   // De nuit, la pile terminée reçoit sa dernière plaque.
@@ -88,20 +92,21 @@ export const PROJECT_PAGE: Pose = { camera: [11, 8, 12.6], target: [0, 1.2, 0], 
  * Sur téléphone, la tour vit dans le haut de l'écran, au-dessus des panneaux de texte
  * qui défilent par-dessus : même pose, plus de recul, recentrée.
  */
-function narrow(p: Pose): Pose {
+function narrow(p: Pose, k = 1.55, lift = 0.24): Pose {
   const [x, y, z] = p.camera;
   const [tx, ty, tz] = p.target;
-  const k = 1.55;
   return {
     ...p,
     camera: [tx + (x - tx) * k, ty + (y - ty) * k, tz + (z - tz) * k],
-    shift: [0, 0.24],
+    shift: [0, lift],
   };
 }
 
 export function poseFor(id: SectionId, t: number, wide: boolean): Pose {
   const p = WIDE[id](t);
-  return wide ? p : narrow(p);
+  if (wide) return p;
+  // Le livre ouvert est plus large que la tour : plus de recul pour qu'il tienne dans la largeur d'un téléphone.
+  return id === "projets" ? narrow(p, 2.15, 0.2) : narrow(p);
 }
 
 export function projectPagePose(wide: boolean): Pose {

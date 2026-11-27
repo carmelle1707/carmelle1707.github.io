@@ -24,6 +24,8 @@ export function useChapters(enabled: boolean) {
         // L'accueil commence en haut de page : au repos, sa pose est celle du début.
         start: id === "accueil" ? "top top" : "top 60%",
         end: "bottom 60%",
+        // Calculés après les épinglages (tri de ScrollTrigger.sort) : un chapitre épinglé s'allonge de sa durée d'épinglage.
+        refreshPriority: -1,
         onUpdate: (self) => {
           scroll.local[id] = self.progress;
           scroll.px[id] = Math.max(0, self.scroll() - self.start);
@@ -52,7 +54,7 @@ export function useChapters(enabled: boolean) {
       root.classList.toggle("is-night", top <= 64);
     };
     const nightTrigger = contact
-      ? ScrollTrigger.create({ trigger: contact, start: "top bottom", end: "max", onUpdate: paint, onRefresh: paint, onLeaveBack: paint })
+      ? ScrollTrigger.create({ trigger: contact, start: "top bottom", end: "max", refreshPriority: -1, onUpdate: paint, onRefresh: paint, onLeaveBack: paint })
       : null;
     paint();
 

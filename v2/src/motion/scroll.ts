@@ -35,7 +35,15 @@ export const scroll = {
   night: 0,
   /** Page d'un projet : la tour tient une pose fixe, à droite du texte. */
   page: "home" as "home" | "project",
+  /** Le livre des projets : 0 fermé, k ouvert sur la double page du projet k (1 à n). */
+  book: 0,
 };
+
+/**
+ * La main sur le livre : `drag` vaut la page tenue pendant qu'on la tourne au doigt ou à la souris
+ * (null sinon), `peek` soulève légèrement le coin survolé (+ vers la page suivante, − vers la précédente).
+ */
+export const bookInput = { drag: null as number | null, peek: 0 };
 
 /** Position de la souris dans la fenêtre, de -1 à 1, partagée par la scène et les effets de survol. */
 export const pointer = { x: 0, y: 0 };

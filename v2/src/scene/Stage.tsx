@@ -18,6 +18,9 @@ type Props = {
 
 type Loop = "always" | "demand" | "never";
 
+/** En développement seulement : `?keep3d` garde la scène même sur un navigateur de test trop lent (rendu logiciel). */
+const keep3d = import.meta.env.DEV && typeof location !== "undefined" && location.search.includes("keep3d");
+
 function useDarkScheme() {
   const [dark, setDark] = useState(false);
   useEffect(() => {
@@ -88,7 +91,7 @@ export default function Stage({ reduced, wide, waiting, onReady, onDecline }: Pr
     >
       <Pauser reduced={reduced} wide={wide} onLoop={setLoop} />
       {/* Sous 24 images/s on allège (résolution 1), et seul un appareil qui n'y arrive vraiment pas passe à l'image fixe. */}
-      <PerformanceMonitor bounds={() => [24, 50]} onDecline={() => setDpr(1)} flipflops={6} onFallback={onDecline} />
+      <PerformanceMonitor bounds={() => [24, 50]} onDecline={() => setDpr(1)} flipflops={6} onFallback={keep3d ? undefined : onDecline} />
       <Tower day={dark ? DARK : LIGHT} night={NIGHT} reduced={reduced} wide={wide} started={!waiting} />
     </Canvas>
   );
