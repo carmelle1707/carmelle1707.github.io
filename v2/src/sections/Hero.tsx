@@ -15,47 +15,62 @@ function nameLines() {
 }
 
 /**
- * Accueil. Le nom monte lettre par lettre de derrière sa ligne pendant que la caméra
- * remonte le long de la tour ; en défilant, le texte s'élève et laisse la place.
+ * Accueil : une couverture éditoriale, pas une carte de visite.
+ * Le nom s'impose pendant que la tour 3D prend place dans le champ opposé.
  */
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const started = useStage((s) => s.started);
   const lines = nameLines();
 
-  // L'ouverture : une seule fois, quand l'écran de démarrage est parti.
   useMotion(
     ref,
     (root) => {
       if (!started) return;
       const tl = gsap.timeline({ defaults: { ease: "expo.out" }, delay: 0.15 });
-      tl.fromTo(pick(root, ".ch"), { yPercent: 115, y: 0, rotate: 6 }, { yPercent: 0, y: 0, rotate: 0, duration: 1.3, stagger: 0.03 })
+      tl.fromTo(
+        pick(root, ".hero-kicker, .hero-index"),
+        { opacity: 0, y: 14, letterSpacing: "0.2em" },
+        { opacity: 1, y: 0, letterSpacing: "0.12em", duration: 0.9, stagger: 0.1 },
+        0,
+      )
+        .fromTo(
+          pick(root, ".ch"),
+          { yPercent: 115, y: 0, rotate: 6 },
+          { yPercent: 0, y: 0, rotate: 0, duration: 1.3, stagger: 0.03 },
+          0.15,
+        )
         .fromTo(
           pick(root, ".hero-role .rl"),
           { clipPath: "inset(0% 0% 100% 0%)", yPercent: 60 },
           { clipPath: "inset(0% 0% 0% 0%)", yPercent: 0, duration: 1.1, stagger: 0.12 },
-          0.5,
+          0.55,
         )
-        .fromTo(pick(root, ".hero-actions > *"), { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1, stagger: 0.08 }, 0.8)
-        .fromTo(pick(root, ".scroll-cue"), { opacity: 0 }, { opacity: 1, duration: 0.8 }, 1.3);
+        .fromTo(
+          pick(root, ".hero-actions > *"),
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1, stagger: 0.08 },
+          0.9,
+        )
+        .fromTo(pick(root, ".scroll-cue"), { opacity: 0 }, { opacity: 1, duration: 0.8 }, 1.4);
       const unmag = magnetic(root.querySelector<HTMLElement>(".btn-primary"));
       return () => unmag();
     },
     [started],
   );
 
-  // La sortie, liée au défilement : le texte s'élève et s'efface, la tour reste.
+  // La sortie est liée au défilement : le nom s'efface, la sculpture reste et accompagne le récit.
   useMotion(ref, (root) => {
     gsap.to(pick(root, ".hero-copy"), {
-      yPercent: -22,
+      yPercent: -18,
       opacity: 0,
       ease: "none",
       scrollTrigger: { trigger: root, start: "top top", end: "bottom 15%", scrub: true },
     });
-    gsap.to(pick(root, ".hero-foot"), {
+    gsap.to(pick(root, ".hero-foot, .hero-index"), {
       opacity: 0,
       ease: "none",
-      scrollTrigger: { trigger: root, start: "top top", end: "+=160", scrub: true },
+      scrollTrigger: { trigger: root, start: "top top", end: "+=180", scrub: true },
     });
   });
 
@@ -65,6 +80,7 @@ export function Hero() {
         <Still />
       </div>
       <div className="hero-copy" data-window>
+        <p className="hero-kicker">Portfolio créatif <span>—</span> Abidjan, Côte d’Ivoire</p>
         <h1 id="hero-title" tabIndex={-1} aria-label={PROFILE.name}>
           {lines.map((l) => (
             <span className="line" key={l}>
@@ -73,21 +89,24 @@ export function Hero() {
           ))}
         </h1>
         <p className="hero-role">
-          <span className="rl">Développeuse full stack à Abidjan,</span>{" "}
-          <span className="rl">de la base de données à l'écran.</span>
+          <span className="rl">Je conçois et développe des expériences numériques,</span>{" "}
+          <span className="rl">du back-end à l’interface.</span>
         </p>
         <div className="hero-actions">
           <a className="btn btn-primary" href="#projets">
-            Voir mes projets
+            Explorer mes projets <span aria-hidden="true">↗</span>
           </a>
           <a className="btn-text" href="#contact">
             Me contacter
           </a>
         </div>
       </div>
+      <p className="hero-index" aria-hidden="true">
+        <span>01</span> <i /> <span>05</span>
+      </p>
       <div className="hero-foot">
         <a className="scroll-cue" href="#apropos">
-          <span>Faire défiler</span>
+          <span>Défiler pour découvrir</span>
           <span className="scroll-cue-line" aria-hidden="true" />
         </a>
       </div>

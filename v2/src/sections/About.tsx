@@ -6,13 +6,9 @@ import { Words } from "../motion/split";
 import { Chapter } from "./Sections";
 import { Shard } from "./icons";
 
-/** Les mots qui portent la présentation : ils s'allument en gras, soulignés d'or. */
 const KEYS = ["Abidjan", "WeCode", "Groupe Tasnim", "Figma", "intelligence artificielle"];
 
-/**
- * À propos. Le portrait s'ouvre comme un volet, la présentation s'allume mot à mot
- * au rythme de la lecture, des éclats de plaques dérivent autour.
- */
+/** Portrait éditorial et récit personnel, révélés au rythme de la lecture. */
 export function About() {
   const ref = useRef<HTMLElement>(null);
 
@@ -26,11 +22,12 @@ export function About() {
 
     const bio = root.querySelector(".about-bio");
     if (bio) {
+      const words = pick(bio, ".w");
       const tl = gsap.timeline({ scrollTrigger: { trigger: bio, start: "top 80%", end: "bottom 45%", scrub: true } });
-      tl.fromTo(pick(bio, ".w"), { opacity: 0.18 }, { opacity: 1, ease: "none", stagger: 0.08, duration: 0.4 }, 0);
-      pick(bio, ".k").forEach((k) => {
-        const at = (tl.duration() * pick(bio, ".w").indexOf(k)) / pick(bio, ".w").length;
-        tl.fromTo(k, { "--u": "0%" }, { "--u": "100%", ease: "power2.out", duration: 0.5 }, at);
+      tl.fromTo(words, { opacity: 0.18, y: 8 }, { opacity: 1, y: 0, ease: "none", stagger: 0.08, duration: 0.4 }, 0);
+      pick(bio, ".k").forEach((key) => {
+        const at = (tl.duration() * words.indexOf(key)) / Math.max(1, words.length);
+        tl.fromTo(key, { "--u": "0%" }, { "--u": "100%", ease: "power2.out", duration: 0.5 }, at);
       });
     }
 
@@ -48,7 +45,6 @@ export function About() {
       );
     });
 
-    // La bande de photos glisse de côté pendant qu'on descend.
     const strip = root.querySelector<HTMLElement>(".strip");
     const list = strip?.querySelector<HTMLElement>("ul");
     if (strip && list) {
@@ -78,29 +74,25 @@ export function About() {
             loading="lazy"
             decoding="async"
           />
+          <figcaption className="portrait-caption">Ange Carmelle Gbedji <span>—</span> Développeuse full stack</figcaption>
         </figure>
         <div className="about-copy">
+          <p className="editorial-kicker">Derrière les lignes de code</p>
           <h2 id="about-title">Construite à Abidjan, étage par étage</h2>
           <p className="about-bio">
             <Words text={PROFILE.bio} keys={KEYS} />
           </p>
           <p>
             <a className="btn-text" href="/video">
-              Me voir en 60 secondes, en vidéo
+              Me voir en 60 secondes, en vidéo <span aria-hidden="true">↗</span>
             </a>
           </p>
         </div>
       </div>
       <div className="shards" aria-hidden="true">
-        <span className="shard shard-a" data-speed="0.6">
-          <Shard variant="slab" />
-        </span>
-        <span className="shard shard-b" data-speed="-0.4">
-          <Shard variant="braces" />
-        </span>
-        <span className="shard shard-c" data-speed="1">
-          <Shard variant="thin" />
-        </span>
+        <span className="shard shard-a" data-speed="0.6"><Shard variant="slab" /></span>
+        <span className="shard shard-b" data-speed="-0.4"><Shard variant="braces" /></span>
+        <span className="shard shard-c" data-speed="1"><Shard variant="thin" /></span>
       </div>
       <figure className="strip">
         <ul>
@@ -110,7 +102,7 @@ export function About() {
             </li>
           ))}
         </ul>
-        <figcaption>Remise des attestations WeCode, Abidjan</figcaption>
+        <figcaption>Un chapitre de mon parcours — WeCode, Abidjan</figcaption>
       </figure>
     </Chapter>
   );
